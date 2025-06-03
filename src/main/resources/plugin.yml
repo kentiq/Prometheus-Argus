@@ -1,0 +1,134 @@
+name: Prometheus Argus
+version: 1.7-ALPHA
+main: com.prometheusargus.PrometheusArgus
+api-version: 1.8.8
+authors: [Kentiq]
+description: "Un plugin d'anti-cheat pour serveurs Minecraft."
+
+commands:
+  prometheusargus:
+    description: "Commande principale de Prometheus Argus."
+    aliases: [pa]
+    permission: prometheusargus.command.base
+    usage: "/<command> [subcommand] [args...]"
+  report:
+    description: "Signaler un joueur pour tricherie ou mauvais comportement."
+    aliases: [signaler]
+    permission: prometheusargus.report.use
+    usage: "/<command> <joueur> <raison>"
+
+permissions:
+  prometheusargus.alerts:
+    description: "Permet de recevoir les alertes de l'anti-cheat."
+    default: op
+  prometheusargus.bypass:
+    description: "Permet de contourner toutes les detections de l'anti-cheat."
+    default: op
+  prometheusargus.bypass.*:
+    description: "Permet de contourner un check specifique."
+    default: op
+  prometheusargus.bypass.freeze:
+    description: "Permet de ne pas être gelé par /pa freeze."
+    default: op
+
+  prometheusargus.command.base:
+    description: "Permet d'utiliser la commande /pa de base et /pa help."
+    default: op
+  prometheusargus.command.ban:
+    description: "Permet d'utiliser /pa ban."
+    default: op
+  prometheusargus.command.unban:
+    description: "Permet d'utiliser /pa unban."
+    default: op
+  prometheusargus.command.kick:
+    description: "Permet d'utiliser /pa kick."
+    default: op
+  prometheusargus.command.lookup:
+    description: "Permet d'utiliser /pa lookup."
+    default: op
+  prometheusargus.command.history:
+    description: "Permet d'utiliser /pa history."
+    default: op
+  prometheusargus.command.reload:
+    description: "Permet d'utiliser /pa reload."
+    default: op
+
+  prometheusargus.command.freeze:
+    description: "Permet d'utiliser /pa freeze <joueur>."
+    default: op
+  prometheusargus.command.mute:
+    description: "Permet d'utiliser /pa mute <joueur> <temps> <raison>."
+    default: op
+  prometheusargus.command.unmute:
+    description: "Permet d'utiliser /pa unmute <joueur>."
+    default: op
+
+  prometheusargus.notes.add:
+    description: "Permet d'ajouter des notes à un joueur via /pa notes <joueur> add."
+    default: op
+  prometheusargus.notes.view:
+    description: "Permet de voir les notes d'un joueur via /pa notes <joueur> view."
+    default: op
+  prometheusargus.notes.remove:
+    description: "Permet de supprimer les notes d'un joueur via /pa notes <joueur> remove."
+    default: op
+
+  prometheusargus.report.use:
+    description: "Permet d'utiliser la commande /report <joueur> <raison>."
+    default: true
+  prometheusargus.reports.view:
+    description: "Permet d'utiliser /pa reports pour voir les signalements."
+    default: op
+  prometheusargus.reports.receive:
+    description: "Permet de recevoir les notifications de nouveaux signalements."
+    default: op
+  prometheusargus.reports.manage:
+    description: "Permet de gérer les signalements (ex: fermer un report)."
+    default: op
+
+  prometheusargus.staffchat.use:
+    description: "Permet d'envoyer des messages dans le staff chat via /pa sc <message>."
+    default: op
+  prometheusargus.staffchat.toggle:
+    description: "Permet d'utiliser /pa sc pour activer/désactiver le mode staff chat."
+    default: op
+  prometheusargus.staffchat.receive:
+    description: "Permet de recevoir les messages du staff chat."
+    default: op
+
+  prometheusargus.staffgui:
+    description: "Permet d'ouvrir le GUI staff via /pa staff."
+    default: op
+  prometheusargus.staff.observe:
+    description: "Permet d'utiliser /pa observe."
+    default: op
+  prometheusargus.staff.test:
+    description: "Permet d'utiliser /pa test."
+    default: op
+  prometheusargus.staff.teleport:
+    description: "Permet de se teleporter via le GUI."
+    default: op
+
+  prometheusargus.bypass.reacha:
+    description: "Permet de contourner le check ReachA."
+    default: op
+  prometheusargus.bypass.knockbacka:
+    description: "Permet de contourner le check KnockbackA."
+    default: op
+
+  # Nouvelles permissions pour le mode modérateur
+  prometheusargus.modmode.use:
+    description: "Permet d'utiliser le mode modérateur via /pa mod."
+    default: op
+  prometheusargus.modmode.items:
+    description: "Permet d'utiliser les items de modération."
+    default: op
+  prometheusargus.modmode.bypass:
+    description: "Permet de contourner les restrictions du mode modérateur."
+    default: op
+  prometheusargus.modmode.see:
+    description: "Permet de voir les modérateurs en mode modérateur."
+    default: op
+  prometheusargus.modmode.notify:
+    description: "Permet de recevoir les notifications du mode modérateur."
+    default: op

@@ -1,0 +1,191 @@
+global_debug_mode: false 
+debug_config_loading: true 
+
+history:
+  max_entries: 1000 # Augmenté pour une meilleure traçabilité
+
+checks:
+  reach_a:
+    enabled: true
+    debug_mode: false
+    max_distance: 4.0
+    thresholds:
+      low: 5
+      medium: 10
+      high: 15
+    ban:
+      threshold: 20
+      reason: "&c&l[Prometheus Argus] &fTricherie détectée &7(Reach)"
+
+  nofall_a: # Utilisé par NoFallCheck_CustomFall qui flagge avec "NoFallCustom"
+    enabled: true
+    debug_mode: false
+    min_fall_distance_check: 4.5
+    vl_increment: 8
+    thresholds:
+      low: 8    
+      medium: 16 
+    ban:
+      threshold: 24 
+      reason: "&c&l[Prometheus Argus] &fTricherie détectée &7(NoFall)"
+
+  fly_a: # Pour Fly_Vertical, Fly_Hover, Fly_InvalidGround (checks combinés)
+    enabled: true
+    debug_mode: false
+    max_vertical_gain_tick: 0.52
+    max_vertical_gain_jump: 1.35
+    max_ticks_hovering: 20 
+    min_y_change_reset_hover: -0.0784
+    invalid_ground_buffer_threshold: 3
+    vl_increment_vertical: 4
+    vl_increment_hover: 3
+    vl_increment_invalid_ground: 2
+    thresholds:
+      low: 8
+      medium: 15
+    ban:
+      threshold: 25 
+      reason: "&c&l[Prometheus Argus] &fTricherie détectée &7(Fly)"
+
+  fly_b_glide:
+    enabled: true
+    debug_mode: false
+    min_glide_delta_y: -0.150
+    max_glide_delta_y: -0.005
+    min_ticks_in_air_for_glide: 10
+    glide_buffer_threshold: 3
+    vl_increment: 5
+    thresholds:
+      low: 5   
+      medium: 10  
+    ban:
+      threshold: 15 
+      reason: "&c&l[Prometheus Argus] &fTricherie détectée &7(Glide)"
+
+  knockback_a:
+    enabled: true
+    debug_mode: false
+    min_expected_kb_to_check: 0.05
+    min_kb_ratio_taken: 0.20
+    check_ticks_window: 4
+    vl_increment: 2
+    thresholds:
+      low: 4
+      medium: 8
+    ban:
+      threshold: 12
+      reason: "&c&l[Prometheus Argus] &fTricherie détectée &7(Anti-Knockback)"
+
+  # NOUVELLE SECTION POUR SPEED (si elle n'existe pas déjà avec cette structure)
+  speed: # Option globale pour les checks de speed
+    enabled: true
+
+  speed_a: # Mouvement Horizontal
+    enabled: true
+    debug_mode: false
+    base_max_speed_per_tick: 0.288 
+    sprint_multiplier: 1.3
+    sneak_multiplier: 0.42
+    potion_multiplier_per_level: 0.20
+    jump_boost_leniency: 1.25
+    air_leniency: 1.15
+    ice_multiplier: 1.8
+    web_divisor: 4.0
+    thresholds:
+      low: 5
+      medium: 10
+      high: 15 # Optionnel si vous ne voulez que low/medium avant ban
+    ban:
+      threshold: 20
+      reason: "&c&l[Prometheus Argus] &fTricherie détectée &7(Speed)"
+
+  speed_b_jump: # Saut
+    enabled: true
+    debug_mode: false
+    max_normal_jump_height: 1.253
+    potion_jump_multiplier_per_level: 0.5
+    thresholds:
+      low: 3
+      medium: 6
+    ban:
+      threshold: 10
+      reason: "&c&l[Prometheus Argus] &fTricherie détectée &7(Speed Jump)"
+
+  speed_c_packet: # Vitesse des paquets
+    enabled: false # Désactivé par défaut car expérimental
+    debug_mode: false
+    packet_speed_threshold: 1.5 
+    max_theoretical_speed_bps: 7.5 # Vitesse max en blocs par seconde attendue (sprint + speed II + sauts)
+    thresholds:
+      low: 5
+      medium: 10
+    ban:
+      threshold: 15
+      reason: "&c&l[Prometheus Argus] &fTricherie détectée &7(Speed Packet)"
+
+  speed_d_ground: # Consistance au sol
+    enabled: true
+    debug_mode: false
+    leniency_ticks: 5 
+    thresholds:
+      low: 8
+      medium: 15
+    ban:
+      threshold: 25
+      reason: "&c&l[Prometheus Argus] &fTricherie détectée &7(Speed Ground)"
+
+# Configuration des messages
+messages:
+  # ... (vos messages existants pour ban, kick, etc.) ...
+  freeze:
+    target_message: "&c&l[Prometheus Argus] &fVOUS AVEZ ÉTÉ GELÉ !\n&7Ne vous déconnectez pas, sous peine de sanction.\n&7Un membre du staff va vous contacter."
+    staff_frozen: "&a&l[Prometheus Argus] &f%player% &7a été gelé."
+    staff_unfrozen: "&a&l[Prometheus Argus] &f%player% &7a été dégelé."
+    disconnect_broadcast: "&c&l[Prometheus Argus] &f%player% &7s'est déconnecté en étant gelé et a été &4&lBANNI&7."
+  unfreeze:
+    target_message: "&a&l[Prometheus Argus] &fVOUS AVEZ ÉTÉ DÉGELÉ.\n&7Vous pouvez à nouveau bouger."
+  mute:
+    target_muted: "&c&l[Prometheus Argus] &fVous avez été réduit au silence par &e%source% &7pour : &f%reason%\n&7Votre silence est &e%expiration_type%."
+    cannot_chat: "&c&l[Prometheus Argus] &fVous êtes réduit au silence.\n&7Raison: &f%reason%\n&7Temps restant: &e%time_left%."
+    broadcast: "&c&l[Prometheus Argus] &f%target% &7a été réduit au silence par &e%source% &7(%duration%)\n&7Raison: &f%reason%"
+  unmute:
+    target_unmuted: "&a&l[Prometheus Argus] &fVotre silence a été levé par &e%source%.\n&7Vous pouvez à nouveau parler."
+    broadcast: "&a&l[Prometheus Argus] &fLe silence de &e%target% &7a été levé par &e%source%."
+  notes:
+    added: "&a&l[Prometheus Argus] &fNote ajoutée pour &e%player%."
+    removed: "&a&l[Prometheus Argus] &fNote #%id% pour &e%player% &7supprimée."
+    no_notes: "&7&l[Prometheus Argus] &fAucune note pour &e%player%."
+    header: "&6&l[Prometheus Argus] &fNotes pour &e%player% &7(Page &f%page%&7/&f%totalPages%&7)"
+    not_found: "&c&l[Prometheus Argus] &fID de note invalide ou note non trouvée."
+    id_must_be_number: "&c&l[Prometheus Argus] &fL'ID de la note doit être un nombre."
+  report:
+    player_reported_self: "&c&l[Prometheus Argus] &fVous ne pouvez pas vous signaler vous-même."
+    player_not_found: "&c&l[Prometheus Argus] &fJoueur &e'%player%' &7introuvable."
+    reason_required: "&c&l[Prometheus Argus] &fVeuillez spécifier une raison pour votre signalement."
+    report_sent: "&a&l[Prometheus Argus] &fVotre signalement contre &e%reported_player% &7a été envoyé au staff."
+    staff_alert: "&4&l[REPORT] &f%reporter% &7a signalé &e%reported% &7pour: &f%reason%"
+    cooldown: "&c&l[Prometheus Argus] &fVous avez déjà signalé ce joueur récemment."
+    gui_closed: "&a&l[Prometheus Argus] &fSignalement ID &e%id% &7marqué comme traité."
+    gui_close_error: "&c&l[Prometheus Argus] &fImpossible de fermer le signalement ID &e%id%."
+    gui_no_reports: "&a&l[Prometheus Argus] &fAucun signalement en attente."
+  staffchat:
+    toggle_on: "&3&l[StaffChat] &fActivé. Vos messages sont maintenant privés au staff."
+    toggle_off: "&3&l[StaffChat] &fDésactivé. Vos messages sont maintenant publics."
+    format: "&3&l[StaffChat] &b%player%&7: &f%message%"
+
+# Configuration des fonctionnalités
+freeze:
+  allowed_commands: # Commandes autorisées quand on est freeze
+    - "/msg"
+    - "/tell"
+    - "/r"
+    - "/helpop" # Exemple
+  punish_on_disconnect: true
+  disconnect_ban_reason: "&c&l[Prometheus Argus] &fDéconnexion pendant un gel"
+  disconnect_ban_duration: "7d" # Exemple: 7 jours. 'perm' pour permanent.
+
+reports:
+  cooldown_minutes: 5 # Temps en minutes avant de pouvoir re-signaler le même joueur
+
+notes:
+  max_per_player: 50 # Augmenté pour plus de flexibilité

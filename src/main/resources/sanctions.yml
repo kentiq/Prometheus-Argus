@@ -1,0 +1,81 @@
+# Configuration des sanctions pour Prometheus Argus
+
+# Messages
+messages:
+  prefix: "&4&l[Prometheus] &r"
+  kick:
+    default: "&cVous avez été expulsé du serveur"
+    with-reason: "&cVous avez été expulsé du serveur\n&7Raison: &f%reason%"
+  ban:
+    temporary: "&cVous avez été banni du serveur\n&7Durée: &f%duration%\n&7Raison: &f%reason%"
+    permanent: "&cVous avez été banni définitivement du serveur\n&7Raison: &f%reason%"
+  mute:
+    temporary: "&cVous avez été réduit au silence\n&7Durée: &f%duration%\n&7Raison: &f%reason%"
+    permanent: "&cVous avez été réduit au silence définitivement\n&7Raison: &f%reason%"
+  staff:
+    kick: "&e%player% a été expulsé par %moderator%"
+    kick-with-reason: "&e%player% a été expulsé par %moderator%\n&7Raison: &f%reason%"
+    ban: "&e%player% a été banni par %moderator%"
+    ban-with-reason: "&e%player% a été banni par %moderator%\n&7Raison: &f%reason%"
+    mute: "&e%player% a été réduit au silence par %moderator%"
+    mute-with-reason: "&e%player% a été réduit au silence par %moderator%\n&7Raison: &f%reason%"
+
+# Templates de sanctions
+templates:
+  spam:
+    name: "Spam"
+    description: "Spam dans le chat"
+    actions:
+      - type: "mute"
+        duration: "1h"
+        reason: "Spam dans le chat"
+  insultes:
+    name: "Insultes"
+    description: "Insultes envers un joueur"
+    actions:
+      - type: "mute"
+        duration: "24h"
+        reason: "Insultes envers un joueur"
+  cheat:
+    name: "Cheat"
+    description: "Utilisation de cheats"
+    actions:
+      - type: "ban"
+        duration: "30d"
+        reason: "Utilisation de cheats"
+  publicite:
+    name: "Publicité"
+    description: "Publicité non autorisée"
+    actions:
+      - type: "ban"
+        duration: "7d"
+        reason: "Publicité non autorisée"
+
+# Durées par défaut
+default-durations:
+  mute:
+    - "1h"
+    - "24h"
+    - "7d"
+    - "30d"
+    - "permanent"
+  ban:
+    - "1d"
+    - "7d"
+    - "30d"
+    - "permanent"
+
+# Configuration des logs
+logging:
+  enabled: true
+  format: "[%date%] %action%: %player% par %moderator% - %reason%"
+  file: "logs/sanctions.log"
+  database:
+    enabled: false
+    type: "mysql" # ou "sqlite"
+    host: "localhost"
+    port: 3306
+    database: "prometheus"
+    username: "root"
+    password: "password"
+    table: "sanctions" 

@@ -1,0 +1,101 @@
+# Configuration du Mode Modérateur de Prometheus Argus
+
+# Paramètres généraux
+settings:
+  auto-vanish: true
+  persist-mode: true
+  allow-chat: false
+  allow-commands: false
+  allow-interactions: false
+  allow-damage: false
+  allow-pvp: false
+  allow-fall-damage: false
+  allow-hunger: false
+  allow-weather: false
+  allow-mob-targeting: false
+  vanish-notify-staff: true
+  vanish-show-duration: true
+  cooldown-show-progress: true
+
+# Configuration des items
+items:
+  freeze-stick:
+    material: BLAZE_ROD
+    name: "&c&lBâton de Freeze"
+    lore:
+      - "&7Clic gauche pour geler un joueur"
+      - "&7Clic droit pour dégeler un joueur"
+    cooldown: 3 # secondes
+
+  teleport-stick:
+    material: ENDER_ROD
+    name: "&b&lBâton de Téléportation"
+    lore:
+      - "&7Clic gauche pour se téléporter"
+      - "&7Clic droit pour téléporter un joueur à vous"
+    cooldown: 2 # secondes
+
+  inspect-stick:
+    material: STICK
+    name: "&e&lBâton d'Inspection"
+    lore:
+      - "&7Clic gauche pour inspecter un joueur"
+      - "&7Clic droit pour voir l'inventaire"
+    cooldown: 1 # secondes
+
+  punish-stick:
+    material: BONE
+    name: "&5&lBâton de Punition"
+    lore:
+      - "&7Clic gauche pour kick"
+      - "&7Clic droit pour ban"
+    cooldown: 5 # secondes
+
+  monitor-stick:
+    material: EMERALD
+    name: "&a&lBâton de Surveillance"
+    lore:
+      - "&7Clic gauche pour suivre un joueur"
+      - "&7Clic droit pour arrêter de suivre"
+    cooldown: 2 # secondes
+
+  recall-stick:
+    material: GOLDEN_CARROT
+    name: "&6&lBâton de Rappel"
+    lore:
+      - "&7Clic gauche pour sauvegarder une position"
+      - "&7Clic droit pour retourner à la position sauvegardée"
+    cooldown: 1 # secondes
+
+# Messages
+messages:
+  prefix: "&c&l[ModMode] &r"
+  enabled: "&aMode modérateur activé"
+  disabled: "&cMode modérateur désactivé"
+  no-permission: "&cVous n'avez pas la permission d'utiliser le mode modérateur"
+  cooldown: "&cVous devez attendre %time% secondes avant de réutiliser cet item"
+  player-not-found: "&cJoueur non trouvé"
+  invalid-usage: "&cUtilisation invalide"
+  staff-notification: "&e%player% &7a %action% le mode modérateur"
+  vanish-notification: "&e%player% &7est maintenant en vanish"
+  vanish-disable-notification: "&e%player% &7n'est plus en vanish"
+  vanish-duration: "&7Temps en vanish: &e%duration%"
+  cooldown-progress: "&cCooldown: &e%time%.%decimals%s &7[%progress%]"
+  item-use: "&7Vous avez utilisé &e%item%"
+  item-cooldown: "&cVous devez attendre &e%time%s &cpour utiliser &e%item%"
+  success: "&aOpération réussie"
+  error: "&cUne erreur est survenue"
+  
+  # Messages pour les items
+  freeze-left-click: "&eClic gauche sur un joueur pour le geler"
+  freeze-right-click: "&eClic droit sur un joueur pour le dégeler"
+  teleport-left-click: "&eClic gauche pour vous téléporter"
+  teleport-right-click: "&eClic droit sur un joueur pour le téléporter à vous"
+  inspect-left-click: "&eClic gauche sur un joueur pour l'inspecter"
+  inspect-right-click: "&eClic droit sur un joueur pour voir son inventaire"
+  punish-left-click: "&eClic gauche sur un joueur pour le kick"
+  punish-right-click: "&eClic droit sur un joueur pour le ban"
+  monitor-left-click: "&eClic gauche sur un joueur pour le suivre"
+  monitor-right-click: "&eArrêt du suivi"
+  recall-left-click: "&ePosition sauvegardée"
+  recall-right-click: "&eRetour à la position sauvegardée" 
