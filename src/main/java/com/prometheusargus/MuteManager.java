@@ -1,6 +1,6 @@
 package com.prometheusargus;
 
-import org.bukkit.BanList; // On peut s'en inspirer mais on va faire notre propre stockage pour les mutes
+import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -39,7 +39,7 @@ public class MuteManager implements Listener {
     private void setupMuteFile() {
         muteFile = new File(plugin.getDataFolder(), "mutes.yml");
         if (!muteFile.exists()) {
-            plugin.saveResource("mutes.yml", false); // Crée le fichier avec une structure de base si besoin
+            plugin.saveResource("mutes.yml", false);
         }
         muteConfig = YamlConfiguration.loadConfiguration(muteFile);
     }
@@ -59,15 +59,14 @@ public class MuteManager implements Listener {
                 String reason = muteConfig.getString(path + "reason");
                 String source = muteConfig.getString(path + "source");
                 long createdMillis = muteConfig.getLong(path + "created");
-                long expiresMillis = muteConfig.getLong(path + "expires"); // 0 pour permanent
+                long expiresMillis = muteConfig.getLong(path + "expires");
 
-                if (playerName == null) continue; // Entrée invalide
+                if (playerName == null) continue;
 
                 Date created = new Date(createdMillis);
                 Date expires = (expiresMillis == 0) ? null : new Date(expiresMillis);
 
                 if (expires != null && expires.before(new Date())) {
-                    // Mute expiré, on le retire du fichier
                     muteConfig.set("mutes." + uuidStr, null);
                     continue;
                 }
@@ -76,21 +75,20 @@ public class MuteManager implements Listener {
                 plugin.getLogger().warning("Could not parse UUID for mute entry: " + uuidStr);
             }
         }
-        saveMutes(); // Pour nettoyer les mutes expirés du fichier
+        saveMutes();
         if (plugin.isGlobalDebugModeEnabled()) {
             plugin.getLogger().info("[MuteManager] Loaded " + activeMutes.size() + " active mutes.");
         }
     }
 
     public void saveMutes() {
-        // D'abord, nettoyer la section des mutes dans la config
         muteConfig.set("mutes", null); 
         muteConfig.createSection("mutes");
 
         for (Map.Entry<UUID, MuteEntry> entry : activeMutes.entrySet()) {
             MuteEntry mute = entry.getValue();
             if (mute.getExpires() != null && mute.getExpires().before(new Date())) {
-                continue; // Ne pas sauvegarder les mutes expirés
+                continue;
             }
             String uuidStr = mute.getTargetUUID().toString();
             String path = "mutes." + uuidStr + ".";
@@ -111,12 +109,11 @@ public class MuteManager implements Listener {
         MuteEntry mute = activeMutes.get(playerUUID);
         if (mute != null) {
             if (mute.getExpires() == null || mute.getExpires().after(new Date())) {
-                return true; // Mute permanent ou non expiré
+                return true;
             } else {
-                // Mute expiré, le retirer
                 activeMutes.remove(playerUUID);
-                muteConfig.set("mutes." + playerUUID.toString(), null); // Retirer du fichier config
-                saveMutes(); // Sauvegarder le changement
+                muteConfig.set("mutes." + playerUUID.toString(), null);
+                saveMutes();
                 return false;
             }
         }
@@ -124,7 +121,7 @@ public class MuteManager implements Listener {
     }
     
     public MuteEntry getMuteEntry(UUID playerUUID) {
-        if (isMuted(playerUUID)) { // isMuted gère la vérification d'expiration
+        if (isMuted(playerUUID)) {
             return activeMutes.get(playerUUID);
         }
         return null;
@@ -134,7 +131,7 @@ public class MuteManager implements Listener {
     public void mutePlayer(UUID targetUUID, String targetName, String reason, String source, Date expirationDate) {
         MuteEntry mute = new MuteEntry(targetName, targetUUID, reason, source, new Date(), expirationDate);
         activeMutes.put(targetUUID, mute);
-        saveMutes(); // Sauvegarde immédiate dans le fichier
+        saveMutes();
         
         plugin.getSanctionHistoryManager().addSanction(
             targetName, 
@@ -163,11 +160,11 @@ public class MuteManager implements Listener {
     public boolean unmutePlayer(UUID targetUUID, String source) {
         if (activeMutes.containsKey(targetUUID)) {
             MuteEntry mute = activeMutes.remove(targetUUID);
-            muteConfig.set("mutes." + targetUUID.toString(), null); // Retirer du fichier config
-            saveMutes(); // Sauvegarder le changement
+            muteConfig.set("mutes." + targetUUID.toString(), null);
+            saveMutes();
 
             plugin.getSanctionHistoryManager().addSanction(
-                mute.getTargetName(), // Utiliser le nom stocké dans l'entrée de mute
+                mute.getTargetName(),
                 "Unmute", 
                 "Silence levé par " + source, 
                 source, 
@@ -194,16 +191,16 @@ public class MuteManager implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         if (isMuted(player.getUniqueId())) {
-            MuteEntry mute = getMuteEntry(player.getUniqueId()); // Récupère l'entrée pour afficher les détails
+            MuteEntry mute = getMuteEntry(player.getUniqueId());
             if (mute != null) {
                 String timeLeft = "Permanent";
                 if (mute.getExpires() != null) {
                     long durationMillis = mute.getExpires().getTime() - System.currentTimeMillis();
                     if (durationMillis > 0) {
                         timeLeft = formatDuration(durationMillis);
-                    } else { // Devrait être géré par isMuted, mais double check
+                    } else {
                         unmutePlayer(player.getUniqueId(), "Système (Auto-Expiration)");
-                        return; // Le joueur n'est plus mute, le laisser parler
+                        return;
                     }
                 }
                 
@@ -231,12 +228,11 @@ public class MuteManager implements Listener {
         if (days > 0) sb.append(days).append("j ");
         if (hours > 0) sb.append(hours).append("h ");
         if (minutes > 0) sb.append(minutes).append("m ");
-        if (seconds > 0 || sb.length() == 0) sb.append(seconds).append("s"); // Afficher secondes si c'est tout ce qu'il reste ou si rien d'autre
+        if (seconds > 0 || sb.length() == 0) sb.append(seconds).append("s");
         return sb.toString().trim();
     }
 
 
-    // Classe interne pour stocker les informations d'un mute
     public static class MuteEntry {
         private final String targetName;
         private final UUID targetUUID;

@@ -1,4 +1,4 @@
-package com.prometheusargus; // OU com.prometheusargus; selon où tu mets le fichier
+package com.prometheusargus;
 
 import com.prometheusargus.PlayerACData;
 import com.prometheusargus.PrometheusArgus;
@@ -7,7 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.enchantments.Enchantment; // AJOUT POUR DEPTH_STRIDER
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -96,14 +96,14 @@ public class SpeedCheck implements Listener {
         if (acData.getLastMoveLocation() == null) {
             acData.setLastMoveLocation(from);
             acData.setLastMoveTime(currentTime - 50);
-            acData.setWasOnGroundSpeed(player.isOnGround()); // CORRIGÉ: Utilise la méthode spécifique
+            acData.setWasOnGroundSpeed(player.isOnGround());
             return;
         }
         
         Location actualLastLocation = acData.getLastMoveLocation();
 
         if (actualLastLocation.getX() == to.getX() && actualLastLocation.getY() == to.getY() && actualLastLocation.getZ() == to.getZ()) {
-            acData.setWasOnGroundSpeed(player.isOnGround()); // CORRIGÉ: Utilise la méthode spécifique
+            acData.setWasOnGroundSpeed(player.isOnGround());
             return;
         }
         
@@ -111,11 +111,11 @@ public class SpeedCheck implements Listener {
             acData.wasVelocityAppliedRecently(currentTime, 1000)) {
             acData.setLastMoveLocation(to);
             acData.setLastMoveTime(currentTime);
-            acData.setWasOnGroundSpeed(player.isOnGround()); // CORRIGÉ: Utilise la méthode spécifique
+            acData.setWasOnGroundSpeed(player.isOnGround());
             return;
         }
         
-        checkSpeedA_D(player, acData, actualLastLocation, to); // currentTime n'est pas utilisé ici directement
+        checkSpeedA_D(player, acData, actualLastLocation, to);
         checkSpeedB_Jump(player, acData, actualLastLocation, to);
         if (plugin.getConfig().getBoolean("checks.speed_c_packet.enabled", false)) {
             checkSpeedC_Packet(player, acData, actualLastLocation, to, currentTime);
@@ -123,11 +123,11 @@ public class SpeedCheck implements Listener {
 
         acData.setLastMoveLocation(to);
         acData.setLastMoveTime(currentTime);
-        acData.setWasOnGroundSpeed(isOnGroundCustom(player)); // CORRIGÉ: Utilise la méthode spécifique et isOnGroundCustom
-        acData.setLastYDiffSpeed(to.getY() - actualLastLocation.getY()); // CORRIGÉ: Utilise la méthode spécifique
+        acData.setWasOnGroundSpeed(isOnGroundCustom(player));
+        acData.setLastYDiffSpeed(to.getY() - actualLastLocation.getY());
     }
 
-    @SuppressWarnings("deprecation") // Pour player.isOnGround()
+    @SuppressWarnings("deprecation")
     private void checkSpeedA_D(Player player, PlayerACData acData, Location from, Location to) {
         double deltaX = to.getX() - from.getX();
         double deltaZ = to.getZ() - from.getZ();
@@ -137,7 +137,7 @@ public class SpeedCheck implements Listener {
         double distanceHorizontal = Math.sqrt(distanceHorizontalSq);
 
         double maxAllowedSpeed = speedA_baseMaxSpeedPerTick;
-        boolean currentTickIsOnGround = isOnGroundCustom(player); // Utilise la méthode custom
+        boolean currentTickIsOnGround = isOnGroundCustom(player);
 
         if (player.isSprinting()) {
             maxAllowedSpeed *= speedA_sprintMultiplier;
@@ -162,11 +162,11 @@ public class SpeedCheck implements Listener {
             }
         }
 
-        if (!currentTickIsOnGround && acData.wasOnGroundSpeed()) { // CORRIGÉ: Utilise wasOnGroundSpeed()
+        if (!currentTickIsOnGround && acData.wasOnGroundSpeed()) {
             maxAllowedSpeed *= speedA_jumpBoostLeniency;
         } else if (!currentTickIsOnGround) {
             maxAllowedSpeed *= speedA_airLeniency;
-            acData.onLadderOrVine = isClimbing(player); // Mettre à jour l'état ici
+            acData.onLadderOrVine = isClimbing(player);
             if (acData.onLadderOrVine) maxAllowedSpeed *= 1.5;
         }
         
@@ -183,14 +183,12 @@ public class SpeedCheck implements Listener {
             maxAllowedSpeed *= 0.4;
         }
         
-        // CORRIGÉ: isInWater() n'existe pas sur Player. Vérifier le bloc.
         Block playerBlock = player.getLocation().getBlock();
         if (playerBlock.isLiquid() || player.getEyeLocation().getBlock().isLiquid()) {
              boolean hasDepthStrider = false;
              if (player.getInventory().getBoots() != null && player.getInventory().getBoots().containsEnchantment(Enchantment.DEPTH_STRIDER)) {
                  hasDepthStrider = true;
                  int dsLevel = player.getInventory().getBoots().getEnchantmentLevel(Enchantment.DEPTH_STRIDER);
-                 // Approximation de l'effet de Depth Strider, à ajuster
                  if (dsLevel >= 3) maxAllowedSpeed *= 2.0; 
                  else if (dsLevel == 2) maxAllowedSpeed *= 1.6;
                  else if (dsLevel == 1) maxAllowedSpeed *= 1.3;
@@ -203,7 +201,7 @@ public class SpeedCheck implements Listener {
 
         if (distanceHorizontal > maxAllowedSpeed) {
             String debugInfo = String.format("H-Dist: %.3f (Max: %.3f) OnG: %b Sprint: %b Sneak: %b AirTSpeed: %d Blw:%s",
-                    distanceHorizontal, maxAllowedSpeed - 0.005, currentTickIsOnGround, player.isSprinting(), player.isSneaking(), acData.getAirTicksSpeed(), blockBelow.name()); // CORRIGÉ: Utilise getAirTicksSpeed()
+                    distanceHorizontal, maxAllowedSpeed - 0.005, currentTickIsOnGround, player.isSprinting(), player.isSneaking(), acData.getAirTicksSpeed(), blockBelow.name());
             plugin.flagPlayer(player, acData, "SpeedA", 1, debugInfo);
         }
 
@@ -229,11 +227,11 @@ public class SpeedCheck implements Listener {
         }
     }
 
-    @SuppressWarnings("deprecation") // Pour player.isOnGround()
+    @SuppressWarnings("deprecation")
     private void checkSpeedB_Jump(Player player, PlayerACData acData, Location from, Location to) {
         double deltaY = to.getY() - from.getY();
 
-        if (deltaY <= 0.0001 || !acData.wasOnGroundSpeed() || isOnGroundCustom(player)) { // CORRIGÉ: Utilise wasOnGroundSpeed()
+        if (deltaY <= 0.0001 || !acData.wasOnGroundSpeed() || isOnGroundCustom(player)) {
             return;
         }
         acData.onLadderOrVine = isClimbing(player);
@@ -255,7 +253,7 @@ public class SpeedCheck implements Listener {
         }
         maxJumpHeight += 0.05;
 
-        if (deltaY > acData.getLastYDiffSpeed() && deltaY > 0.42 && deltaY > maxJumpHeight ) { // CORRIGÉ: Utilise getLastYDiffSpeed()
+        if (deltaY > acData.getLastYDiffSpeed() && deltaY > 0.42 && deltaY > maxJumpHeight ) {
              String debugInfo = String.format("JumpY: %.3f (MaxHeight: %.3f) Pot: %b",
                     deltaY, maxJumpHeight-0.05, player.hasPotionEffect(PotionEffectType.JUMP));
             plugin.flagPlayer(player, acData, "SpeedB_Jump", 1, debugInfo);
@@ -293,15 +291,14 @@ public class SpeedCheck implements Listener {
         return climbableBlocks.contains(currentBlock);
     }
     
-    @SuppressWarnings("deprecation") // Pour player.isOnGround() au cas où
+    @SuppressWarnings("deprecation")
     private boolean isOnGroundCustom(Player player) {
-        if (player.isOnGround()) return true; // Raccourci si Bukkit le dit déjà
+        if (player.isOnGround()) return true;
 
         Location loc = player.getLocation();
-        double r = 0.29; // Légèrement moins que 0.3 pour éviter les faux positifs sur les bords exacts
-        double yOffset = -0.015; // Un peu plus bas pour la détection
+        double r = 0.29;
+        double yOffset = -0.015;
         
-        // Vérification des blocs directement sous les "coins" de la hitbox du joueur
         for (double xOffset : new double[]{-r, r}) {
             for (double zOffset : new double[]{-r, r}) {
                 Block block = loc.clone().add(xOffset, yOffset, zOffset).getBlock();
@@ -310,18 +307,16 @@ public class SpeedCheck implements Listener {
                 }
             }
         }
-        // Vérifier aussi le centre
         Block centerBlock = loc.clone().add(0, yOffset, 0).getBlock();
         if (isConsideredSolidForGround(centerBlock.getType())) {
             return true;
         }
 
-        // Vérification un peu plus bas pour les cas limites (comme se tenir sur le bord d'un bloc)
         Block blockDirectlyBelow = loc.clone().add(0, -0.1, 0).getBlock();
          if (isConsideredSolidForGround(blockDirectlyBelow.getType())) {
              return true;
          }
-        return false; // En dernier recours, si aucune de nos conditions n'est remplie
+        return false;
     }
 
     private boolean isConsideredSolidForGround(Material material) {

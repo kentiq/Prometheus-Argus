@@ -37,7 +37,6 @@ public class SanctionsGUIListener implements Listener {
         switch (clickedItem.getType()) {
             case BARRIER:
                 if (clickedItem.getItemMeta().getDisplayName().equals(ChatColor.RED + "Kick")) {
-                    // TODO: Implémenter la logique de kick
                     player.sendMessage(ChatColor.RED + "Fonctionnalité de kick à implémenter");
                 } else if (clickedItem.getItemMeta().getDisplayName().equals(ChatColor.RED + "Fermer")) {
                     player.closeInventory();
@@ -46,48 +45,41 @@ public class SanctionsGUIListener implements Listener {
 
             case PAPER:
                 if (clickedItem.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Mute")) {
-                    // TODO: Implémenter la logique de mute
                     player.sendMessage(ChatColor.YELLOW + "Fonctionnalité de mute à implémenter");
                 }
                 break;
 
             case IRON_DOOR:
                 if (clickedItem.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Ban Temporaire")) {
-                    // TODO: Implémenter la logique de ban temporaire
                     player.sendMessage(ChatColor.GOLD + "Fonctionnalité de ban temporaire à implémenter");
                 }
                 break;
 
             case BEDROCK:
                 if (clickedItem.getItemMeta().getDisplayName().equals(ChatColor.DARK_RED + "Ban Permanent")) {
-                    // TODO: Implémenter la logique de ban permanent
                     player.sendMessage(ChatColor.DARK_RED + "Fonctionnalité de ban permanent à implémenter");
                 }
                 break;
 
             case BOOK:
                 if (clickedItem.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Templates")) {
-                    // TODO: Implémenter la logique des templates
                     player.sendMessage(ChatColor.GREEN + "Fonctionnalité des templates à implémenter");
                 }
                 break;
 
             case WATCH:
                 if (clickedItem.getItemMeta().getDisplayName().equals(ChatColor.AQUA + "Historique")) {
-                    // TODO: Implémenter la logique de l'historique
                     player.sendMessage(ChatColor.AQUA + "Fonctionnalité de l'historique à implémenter");
                 }
                 break;
 
             case BOOK_AND_QUILL:
                 if (clickedItem.getItemMeta().getDisplayName().equals(ChatColor.LIGHT_PURPLE + "Notes")) {
-                    // TODO: Implémenter la logique des notes
                     player.sendMessage(ChatColor.LIGHT_PURPLE + "Fonctionnalité des notes à implémenter");
                 }
                 break;
 
             case SKULL_ITEM:
-                // TODO: Implémenter la logique pour voir l'historique détaillé
                 player.sendMessage(ChatColor.YELLOW + "Historique détaillé à implémenter");
                 break;
         }

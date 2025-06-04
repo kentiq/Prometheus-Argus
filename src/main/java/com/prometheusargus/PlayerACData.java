@@ -15,23 +15,20 @@ public class PlayerACData {
     private final Map<String, Integer> violationLevels;
     public long lastAttackTime;
 
-    // Champs NoFall
     public double verticalFallDistanceCounter;
-    public int ticksInAir; // Gardé pour NoFall, SpeedCheck utilisera aussi airTicks/groundTicks
+    public int ticksInAir;
     public boolean justTookFallDamage;
 
-    // Champs Fly
-    public int flyAbilityTicksInAir; // Gardé pour FlyChecks
+    public int flyAbilityTicksInAir;
     public double lastYPositionFly;
     public int ticksHovering;
     public double highestYReachedInAir;
     public long lastSlimeBounceTime;
-    public boolean onLadderOrVine; // Peut être utilisé par Fly et Speed
+    public boolean onLadderOrVine;
     public Location lastOnGroundLocation;
     public int invalidGroundStateVLBuffer;
     public int glideVLBuffer;
 
-    // Champs pour KnockbackCheck
     public long lastDamageTime;
     public double expectedKnockbackXZ;
     public Vector expectedKnockbackDirection;
@@ -39,17 +36,15 @@ public class PlayerACData {
     public Location locationAtDamage;
     public boolean tookSignificantKnockback;
 
-    // --- AJOUTS POUR SPEEDCHECK ET MOUVEMENT GÉNÉRAL ---
-    private Location lastMoveLocation;          // Dernière position connue pour les calculs de mouvement
-    private long lastMoveTime;                  // Timestamp du dernier mouvement
-    private long lastTeleportTime = 0;          // Timestamp du dernier téléport
-    private boolean wasOnGround = true;         // Si le joueur était au sol au tick précédent
-    private long lastVelocityApplicationTime = 0; // Timestamp de la dernière application de vélocité par le serveur
-    private int airTicksSpeed = 0;              // Ticks consécutifs en l'air (spécifique à la logique de SpeedCheck si besoin de le différencier de FlyChecks.ticksInAir)
-    private int groundTicks = 0;                // Ticks consécutifs au sol
-    private double lastYDiffSpeed = 0;          // Différence Y du dernier mouvement pour SpeedCheck (JumpSpeed)
+    private Location lastMoveLocation;
+    private long lastMoveTime;
+    private long lastTeleportTime = 0;
+    private boolean wasOnGround = true;
+    private long lastVelocityApplicationTime = 0;
+    private int airTicksSpeed = 0;
+    private int groundTicks = 0;
+    private double lastYDiffSpeed = 0;
 
-    // Pour SpeedC (Packet Speed - conceptuel)
     private double packetSpeedBuffer = 0.0;
     private int packetSpeedViolations = 0;
 
@@ -59,12 +54,10 @@ public class PlayerACData {
         this.violationLevels = new HashMap<>();
         this.lastAttackTime = 0;
 
-        // NoFall
         this.verticalFallDistanceCounter = 0.0;
         this.ticksInAir = 0;
         this.justTookFallDamage = false;
 
-        // Fly
         this.flyAbilityTicksInAir = 0;
         this.lastYPositionFly = 0.0;
         this.ticksHovering = 0;
@@ -74,11 +67,9 @@ public class PlayerACData {
         this.invalidGroundStateVLBuffer = 0;
         this.glideVLBuffer = 0;
         
-        // Knockback
         resetKnockbackData();
 
-        // AJOUT: Initialisation pour SpeedCheck et Mouvement
-        this.lastMoveTime = System.currentTimeMillis(); // lastMoveLocation sera mis par initPlayerData
+        this.lastMoveTime = System.currentTimeMillis();
     }
 
     public Player getPlayer() {
@@ -147,7 +138,6 @@ public class PlayerACData {
         this.tookSignificantKnockback = false;
     }
     
-    // --- AJOUT: ACCESSEURS ET MUTATEURS POUR SPEEDCHECK ---
     public Location getLastMoveLocation() {
         return lastMoveLocation;
     }
@@ -166,19 +156,16 @@ public class PlayerACData {
 
     public void recordTeleport() {
         this.lastTeleportTime = System.currentTimeMillis();
-        this.airTicksSpeed = 0; // Réinitialiser les compteurs pour speed
+        this.airTicksSpeed = 0;
         this.groundTicks = 0;
         Player p = getPlayer();
         if (p != null && p.isOnline()) {
             this.lastMoveLocation = p.getLocation();
-            // Important: Ne pas reset lastOnGroundLocation ici, car le TP peut être en l'air.
-            // lastOnGroundLocation est mis à jour par setWasOnGroundSpeed
         } else {
             this.lastMoveLocation = null;
         }
         this.packetSpeedBuffer = 0.0;
         this.packetSpeedViolations = 0;
-        // Reset aussi les données de fly car un TP change radicalement la situation
         resetFlyAbilityData(p != null && p.isOnline() ? p.getLocation() : null);
     }
 
@@ -186,18 +173,15 @@ public class PlayerACData {
         return (currentTime - lastTeleportTime) < gracePeriodMillis;
     }
 
-    public boolean wasOnGroundSpeed() { // "wasOnGround" pour SpeedCheck
+    public boolean wasOnGroundSpeed() {
         return wasOnGround;
     }
 
-    public void setWasOnGroundSpeed(boolean currentIsOnGround) { // "setOnGround" pour SpeedCheck
+    public void setWasOnGroundSpeed(boolean currentIsOnGround) {
         this.wasOnGround = currentIsOnGround;
         if (currentIsOnGround) {
             airTicksSpeed = 0;
             groundTicks++;
-            // lastOnGroundLocation est déjà géré par le FlyChecks ou le NoFallChecks,
-            // ou pourrait être géré ici si SpeedCheck devient le principal gestionnaire de cet état.
-            // Pour l'instant, on laisse la logique de FlyChecks/NoFallChecks gérer lastOnGroundLocation.
         } else {
             groundTicks = 0;
             airTicksSpeed++;
@@ -212,15 +196,15 @@ public class PlayerACData {
         return (currentTime - lastVelocityApplicationTime) < gracePeriodMillis;
     }
 
-    public int getAirTicksSpeed() { // Ticks en l'air pour Speed
+    public int getAirTicksSpeed() {
         return airTicksSpeed;
     }
 
-    public int getGroundTicks() { // Ticks au sol
+    public int getGroundTicks() {
         return groundTicks;
     }
     
-    public double getLastYDiffSpeed() { // Diff Y pour Speed
+    public double getLastYDiffSpeed() {
         return lastYDiffSpeed;
     }
 

@@ -33,7 +33,7 @@ public class ModModeManager implements Listener {
     private final Map<UUID, Long> vanishTimestamps;
     private final Map<UUID, Boolean> modModePlayersMap;
     private final Map<UUID, Long> cooldowns;
-    private static final long COOLDOWN_DURATION = 3000; // 3 secondes en millisecondes
+    private static final long COOLDOWN_DURATION = 3000;
     private YamlConfiguration config;
 
     public ModModeManager(PrometheusArgus plugin) {
@@ -56,31 +56,24 @@ public class ModModeManager implements Listener {
     }
 
     public void enableModMode(Player player) {
-        // Sauvegarder l'état précédent
         previousGameModes.put(player.getUniqueId(), player.getGameMode());
         previousInventories.put(player.getUniqueId(), player.getInventory().getContents());
         
-        // Activer le mode modérateur
         modModePlayers.add(player.getUniqueId());
         modModePlayersMap.put(player.getUniqueId(), true);
         
-        // Appliquer les effets
         player.setGameMode(GameMode.CREATIVE);
         player.setAllowFlight(true);
         player.setFlying(true);
         
-        // Appliquer le vanish
         if (plugin.getModModeConfig().getBoolean("settings.auto-vanish", true)) {
             vanishedPlayers.add(player.getUniqueId());
         }
         
-        // Donner les items
         ModModeItems.giveModItems(player);
         
-        // Effets visuels et sonores
         player.playSound(player.getLocation(), "LEVEL_UP", 1.0f, 1.0f);
         
-        // Title
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -91,7 +84,6 @@ public class ModModeManager implements Listener {
             }
         }.runTaskLater(plugin, 1L);
         
-        // Notification au staff
         String message = plugin.getModModeConfig().getString("messages.staff-notification", "&e%player% &7a activé le mode modérateur")
             .replace("%player%", player.getName())
             .replace("%action%", "activé");
@@ -101,31 +93,25 @@ public class ModModeManager implements Listener {
     }
 
     public void disableModMode(Player player) {
-        // Désactiver le mode modérateur
         modModePlayers.remove(player.getUniqueId());
         modModePlayersMap.remove(player.getUniqueId());
         vanishedPlayers.remove(player.getUniqueId());
         
-        // Restaurer l'état précédent
         GameMode previousMode = previousGameModes.getOrDefault(player.getUniqueId(), GameMode.SURVIVAL);
         player.setGameMode(previousMode);
         previousGameModes.remove(player.getUniqueId());
         
-        // Restaurer l'inventaire
         ItemStack[] previousInventory = previousInventories.get(player.getUniqueId());
         if (previousInventory != null) {
             player.getInventory().setContents(previousInventory);
             previousInventories.remove(player.getUniqueId());
         }
         
-        // Retirer les effets
         player.setAllowFlight(false);
         player.setFlying(false);
         
-        // Effets visuels et sonores
         player.playSound(player.getLocation(), "ANVIL_BREAK", 1.0f, 1.0f);
         
-        // Title
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -136,7 +122,6 @@ public class ModModeManager implements Listener {
             }
         }.runTaskLater(plugin, 1L);
         
-        // Notification au staff
         String message = plugin.getModModeConfig().getString("messages.staff-notification", "&e%player% &7a désactivé le mode modérateur")
             .replace("%player%", player.getName())
             .replace("%action%", "désactivé");
@@ -154,8 +139,6 @@ public class ModModeManager implements Listener {
     }
 
     public void handlePlayerQuit(Player player) {
-        // Ne pas retirer le joueur des listes pour la persistance
-        // Les listes seront nettoyées si nécessaire lors de la désactivation du mode
     }
 
     public void reloadConfig() {
@@ -183,21 +166,18 @@ public class ModModeManager implements Listener {
         vanishedPlayers.add(player.getUniqueId());
         vanishTimestamps.put(player.getUniqueId(), System.currentTimeMillis());
         
-        // Cacher le joueur
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if (!onlinePlayer.hasPermission("prometheusargus.modmode.see")) {
                 onlinePlayer.hidePlayer(player);
             }
         }
         
-        // Effets visuels
         player.playSound(player.getLocation(), "LEVEL_UP", 1.0f, 1.0f);
         player.sendTitle(
             ChatColor.DARK_RED + "" + ChatColor.BOLD + "[Prometheus Argus]",
             ChatColor.GREEN + "Vanish activé"
         );
         
-        // Notification au staff
         String message = plugin.getModModeConfig().getString("messages.vanish-notification", "&e%player% &7est maintenant en vanish")
             .replace("%player%", player.getName());
         notifyStaff(message);
@@ -207,19 +187,16 @@ public class ModModeManager implements Listener {
         vanishedPlayers.remove(player.getUniqueId());
         vanishTimestamps.remove(player.getUniqueId());
         
-        // Montrer le joueur
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             onlinePlayer.showPlayer(player);
         }
         
-        // Effets visuels
         player.playSound(player.getLocation(), "ANVIL_BREAK", 1.0f, 1.0f);
         player.sendTitle(
             ChatColor.DARK_RED + "" + ChatColor.BOLD + "[Prometheus Argus]",
             ChatColor.RED + "Vanish désactivé"
         );
         
-        // Notification au staff
         String message = plugin.getModModeConfig().getString("messages.vanish-notification", "&e%player% &7n'est plus en vanish")
             .replace("%player%", player.getName());
         notifyStaff(message);
@@ -270,39 +247,32 @@ public class ModModeManager implements Listener {
         }
 
         switch (item.getType()) {
-            case BLAZE_ROD: // Bâton de Freeze
-                // TODO: Implémenter la logique de freeze
+            case BLAZE_ROD:
                 setCooldown(player);
                 break;
 
-            case ENDER_PEARL: // Bâton de Téléportation
-                // TODO: Implémenter la logique de téléportation
+            case ENDER_PEARL:
                 setCooldown(player);
                 break;
 
-            case STICK: // Bâton d'Inspection
-                // TODO: Implémenter la logique d'inspection
+            case STICK:
                 setCooldown(player);
                 break;
 
-            case BONE: // Bâton de Punition
-                // TODO: Implémenter la logique de punition
+            case BONE:
                 setCooldown(player);
                 break;
 
-            case EMERALD: // Bâton de Surveillance
-                // TODO: Implémenter la logique de surveillance
+            case EMERALD:
                 setCooldown(player);
                 break;
 
-            case GOLDEN_CARROT: // Bâton de Rappel
-                // TODO: Implémenter la logique de rappel
+            case GOLDEN_CARROT:
                 setCooldown(player);
                 break;
 
-            case BOOK: // Menu de Sanctions
+            case BOOK:
                 event.setCancelled(true);
-                // Le menu de sanctions sera géré par le GUI
                 break;
         }
     }
@@ -325,29 +295,25 @@ public class ModModeManager implements Listener {
         }
 
         switch (item.getType()) {
-            case BLAZE_ROD: // Bâton de Freeze
-                // TODO: Implémenter la logique de freeze
+            case BLAZE_ROD:
                 setCooldown(player);
                 break;
 
-            case ENDER_PEARL: // Bâton de Téléportation
-                // TODO: Implémenter la logique de téléportation
+            case ENDER_PEARL:
                 setCooldown(player);
                 break;
 
-            case STICK: // Bâton d'Inspection
-                // TODO: Implémenter la logique d'inspection
+            case STICK:
                 setCooldown(player);
                 break;
 
-            case BONE: // Bâton de Punition
+            case BONE:
                 event.setCancelled(true);
                 SanctionsGUIListener.setTargetPlayer(player, target);
                 SanctionsGUI.openSanctionsGUI(player, target);
                 break;
 
-            case EMERALD: // Bâton de Surveillance
-                // TODO: Implémenter la logique de surveillance
+            case EMERALD:
                 setCooldown(player);
                 break;
         }

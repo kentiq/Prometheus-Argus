@@ -22,7 +22,7 @@ public class NoFallCheck_CustomFall implements Listener {
 
     private final PrometheusArgus plugin;
     private final boolean DEBUG_MODE;
-    private final double MIN_FALL_DISTANCE_TO_FLAG; // Initialisé dans le constructeur
+    private final double MIN_FALL_DISTANCE_TO_FLAG;
 
     private static final Set<Material> SAFE_LANDING_BLOCKS = new HashSet<>(Arrays.asList(
             Material.WATER, Material.STATIONARY_WATER, Material.LAVA, Material.STATIONARY_LAVA,
@@ -36,8 +36,8 @@ public class NoFallCheck_CustomFall implements Listener {
 
     public NoFallCheck_CustomFall(PrometheusArgus plugin) {
         this.plugin = plugin;
-        this.DEBUG_MODE = plugin.getConfig().getBoolean("checks.nofall_a.debug_mode", true); // Utilise "nofall_a" comme dans ta config
-        this.MIN_FALL_DISTANCE_TO_FLAG = plugin.getConfig().getDouble("checks.nofall_a.min_fall_distance_check", 5.0); // Valeur par défaut si non dans config
+        this.DEBUG_MODE = plugin.getConfig().getBoolean("checks.nofall_a.debug_mode", true);
+        this.MIN_FALL_DISTANCE_TO_FLAG = plugin.getConfig().getDouble("checks.nofall_a.min_fall_distance_check", 5.0);
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         if (DEBUG_MODE) plugin.getLogger().info("[NoFallCustom DEBUG] Initialized. MinFallToFlag: " + MIN_FALL_DISTANCE_TO_FLAG);
     }
@@ -48,7 +48,7 @@ public class NoFallCheck_CustomFall implements Listener {
         Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR || player.getAllowFlight()) {
             PlayerACData acData = plugin.getPlayerDataManager().getPlayerData(player);
-            if (acData != null) acData.resetNoFallData(); // << CORRIGÉ ICI
+            if (acData != null) acData.resetNoFallData();
             return;
         }
 
@@ -63,7 +63,7 @@ public class NoFallCheck_CustomFall implements Listener {
         
         if (player.isInsideVehicle() || isOnLadderOrVine(player) || player.getLocation().getBlock().isLiquid()) {
             if (DEBUG_MODE && acData.ticksInAir > 0) plugin.getLogger().info("[NoFallCustom DEBUG] " + player.getName() + " in vehicle/ladder/liquid. Resetting fall data.");
-            acData.resetNoFallData(); // << CORRIGÉ ICI
+            acData.resetNoFallData();
             acData.lastOnGroundLocation = player.getLocation();
             return;
         }
@@ -86,11 +86,10 @@ public class NoFallCheck_CustomFall implements Listener {
                             PlayerACData currentAcData = plugin.getPlayerDataManager().getPlayerData(p);
                             if (currentAcData == null) return;
 
-                            // J'ai gardé ta logique de vérification de `p.getFallDistance()` ici
                             if (!currentAcData.justTookFallDamage && p.getFallDistance() > 3.0) { 
                                 if (DEBUG_MODE) plugin.getLogger().warning("[NoFallCustom DEBUG] " + p.getName() + " NOFALL DETECTED! CustomFall: " + String.format("%.2f", fallDistAtLanding) + ", ServerFall: " + String.format("%.2f", p.getFallDistance()) + ", No damage event received.");
                                 plugin.flagPlayer(p, currentAcData,
-                                        "NoFallCustom", // Ce sera mappé à "nofall_a" dans la config par PrometheusArgus
+                                        "NoFallCustom",
                                         plugin.getConfig().getInt("checks.nofall_a.vl_increment", 8),
                                         "No damage. CustomDist: " + String.format("%.2f", fallDistAtLanding) + " ServerDist: " + String.format("%.2f", p.getFallDistance())
                                 );
@@ -102,7 +101,7 @@ public class NoFallCheck_CustomFall implements Listener {
                     }
                 }
             }
-            acData.resetNoFallData(); // << CORRIGÉ ICI
+            acData.resetNoFallData();
             acData.lastOnGroundLocation = player.getLocation();
         } else {
             acData.ticksInAir++;
@@ -123,7 +122,6 @@ public class NoFallCheck_CustomFall implements Listener {
 
         if (DEBUG_MODE) plugin.getLogger().info("[NoFallCustom DEBUG] " + player.getName() + " received FALL damage. Amount: " + event.getDamage() + ". CustomFallDist was: " + String.format("%.2f",acData.verticalFallDistanceCounter));
         acData.justTookFallDamage = true; 
-        // acData.resetNoFallData(); // Ne pas reset ici, attendre l'atterrissage complet dans onPlayerMove
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -133,7 +131,7 @@ public class NoFallCheck_CustomFall implements Listener {
         if (acData == null) return;
 
         if (DEBUG_MODE) plugin.getLogger().info("[NoFallCustom DEBUG] " + player.getName() + " teleported, resetting all fall data. Cause: " + event.getCause());
-        acData.resetNoFallData(); // << CORRIGÉ ICI
+        acData.resetNoFallData();
         acData.lastOnGroundLocation = event.getTo(); 
     }
     
@@ -141,7 +139,7 @@ public class NoFallCheck_CustomFall implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event){ 
         PlayerACData acData = plugin.getPlayerDataManager().getPlayerData(event.getPlayer());
         if(acData != null){
-            acData.resetNoFallData(); // << CORRIGÉ ICI
+            acData.resetNoFallData();
         }
     }
 

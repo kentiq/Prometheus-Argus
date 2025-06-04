@@ -15,10 +15,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-// >>> CORRECTIONS IMPORTS <<<
-import java.util.Date; // Pour java.util.Date
-import org.bukkit.BanList; // Pour org.bukkit.BanList
-// >>> FIN CORRECTIONS IMPORTS <<<
+import java.util.Date;
+import org.bukkit.BanList;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -164,7 +162,7 @@ public class FreezeManager implements Listener {
         if (isFrozen(player)) {
             String command = event.getMessage().toLowerCase().split(" ")[0];
             Set<String> allowedCommands = new HashSet<>(plugin.getConfig().getStringList("freeze.allowed_commands"));
-            if (!allowedCommands.contains(command.startsWith("/") ? command : "/" + command)) { // S'assurer que la commande commence par /
+            if (!allowedCommands.contains(command.startsWith("/") ? command : "/" + command)) {
                 player.sendMessage(ChatColor.RED + "Vous ne pouvez pas utiliser cette commande tant que vous êtes gelé.");
                 event.setCancelled(true);
             }
@@ -182,14 +180,12 @@ public class FreezeManager implements Listener {
                 String timeStr = plugin.getConfig().getString("freeze.disconnect_ban_duration", "perm");
                 if (!timeStr.equalsIgnoreCase("perm")) {
                     try {
-                        // CORRECTION VISIBILITÉ : Assurez-vous que parseBanDuration est public dans PrometheusArgus.java
                         expiration = plugin.parseBanDuration(timeStr); 
                     } catch (IllegalArgumentException e) {
                         plugin.getLogger().warning("Format de durée invalide pour freeze.disconnect_ban_duration: " + timeStr + ". Ban permanent appliqué.");
                     }
                 }
                 
-                // CORRECTION IMPORT : Assurez-vous d'avoir import org.bukkit.BanList;
                 Bukkit.getBanList(BanList.Type.NAME).addBan(player.getName(), reason, expiration, banner);
                 plugin.getSanctionHistoryManager().addSanction(player.getName(), "AutoBan:FreezeDisconnect", reason, banner, -1);
                 Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&',

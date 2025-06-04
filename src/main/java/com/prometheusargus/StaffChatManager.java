@@ -18,7 +18,7 @@ public class StaffChatManager implements Listener {
     private final PrometheusArgus plugin;
     private final Set<UUID> staffChatToggled = new HashSet<>();
     private final String staffChatPermission = "prometheusargus.staffchat.use";
-    private final String staffChatReceivePermission = "prometheusargus.staffchat.receive"; // Peut être identique à .use ou séparé
+    private final String staffChatReceivePermission = "prometheusargus.staffchat.receive";
 
     public StaffChatManager(PrometheusArgus plugin) {
         this.plugin = plugin;
@@ -72,16 +72,15 @@ public class StaffChatManager implements Listener {
 
         String format = ChatColor.translateAlternateColorCodes('&',
                 plugin.getConfig().getString("messages.staffchat.format", "&8[&cStaff&8] &e%player%&7: &f%message%")
-                .replace("%player%", sender.getDisplayName()) // Utiliser getDisplayName() pour les préfixes/suffixes
+                .replace("%player%", sender.getDisplayName())
                 .replace("%message%", message));
 
-        plugin.getLogger().info(ChatColor.stripColor("[StaffChat] " + sender.getName() + ": " + message)); // Log en console
+        plugin.getLogger().info(ChatColor.stripColor("[StaffChat] " + sender.getName() + ": " + message));
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if (onlinePlayer.hasPermission(staffChatReceivePermission)) {
                 onlinePlayer.sendMessage(format);
-                // Jouer un son discret pour les destinataires
-                onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.valueOf("SUCCESSFUL_HIT"), 0.5f, 1.5f); // Son léger et aigu
+                onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.valueOf("SUCCESSFUL_HIT"), 0.5f, 1.5f);
             }
         }
     }
@@ -89,15 +88,15 @@ public class StaffChatManager implements Listener {
     /**
      * Intercepte les messages des joueurs qui ont activé le staff chat permanent.
      */
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true) // NORMAL pour permettre à d'autres plugins de formater avant si besoin
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         if (isInStaffChatMode(player)) {
-            if (!player.hasPermission(staffChatPermission)) { // Double check permission au cas où
-                staffChatToggled.remove(player.getUniqueId()); // Corriger l'état si la perm a été retirée
-                return; // Laisser le message passer en chat public
+            if (!player.hasPermission(staffChatPermission)) {
+                staffChatToggled.remove(player.getUniqueId());
+                return;
             }
-            event.setCancelled(true); // Annuler le message dans le chat public
+            event.setCancelled(true);
             sendStaffChatMessage(player, event.getMessage());
         }
     }

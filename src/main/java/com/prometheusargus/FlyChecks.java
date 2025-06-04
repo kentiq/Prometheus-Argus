@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.lang.reflect.Method; // Pour la réflexion
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -47,7 +47,6 @@ public class FlyChecks implements Listener {
         CLIMBABLE_BLOCKS.add(Material.VINE);
     }
 
-    // Pour la compatibilité
     private static PotionEffectType SLOW_FALLING_EFFECT_TYPE = null;
     private static Method IS_GLIDING_METHOD = null;
     private static boolean REFLECTION_INITIALIZED = false;
@@ -59,7 +58,6 @@ public class FlyChecks implements Listener {
 
         this.DEBUG_MODE = plugin.getConfig().getBoolean(flyA_path + "debug_mode", false) || plugin.getConfig().getBoolean(flyB_path + "debug_mode", false);
 
-        // ... (tes initialisations de config restent les mêmes) ...
         this.MAX_VERTICAL_GAIN_PER_TICK = plugin.getConfig().getDouble(flyA_path + "max_vertical_gain_tick", 0.52);
         this.MAX_VERTICAL_GAIN_JUMP = plugin.getConfig().getDouble(flyA_path + "max_vertical_gain_jump", 1.35);
         this.MAX_TICKS_HOVERING = plugin.getConfig().getInt(flyA_path + "max_ticks_hovering", 25);
@@ -75,7 +73,7 @@ public class FlyChecks implements Listener {
         this.GLIDE_BUFFER_THRESHOLD = plugin.getConfig().getInt(flyB_path + "glide_buffer_threshold", 4);
         this.VL_INCREMENT_GLIDE = plugin.getConfig().getInt(flyB_path + "vl_increment", 4);
 
-        initializeReflection(); // Initialiser la réflexion ici
+        initializeReflection();
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         if (DEBUG_MODE) plugin.getLogger().info("[FlyChecks DEBUG] Initialized.");
@@ -88,7 +86,7 @@ public class FlyChecks implements Listener {
             if (SLOW_FALLING_EFFECT_TYPE == null && DEBUG_MODE) {
                 plugin.getLogger().info("[FlyChecks DEBUG] PotionEffectType.SLOW_FALLING not found (likely pre-1.13 server).");
             }
-        } catch (Throwable t) { // Catch Throwable pour NoClassDefFoundError sur très vieilles versions
+        } catch (Throwable t) {
             if (DEBUG_MODE) plugin.getLogger().log(Level.WARNING, "[FlyChecks DEBUG] Error resolving PotionEffectType.SLOW_FALLING.", t);
         }
 
@@ -105,14 +103,14 @@ public class FlyChecks implements Listener {
 
     private boolean hasSlowFallingEffect(Player player) {
         if (SLOW_FALLING_EFFECT_TYPE == null) {
-            return false; // Effet non disponible sur cette version de serveur
+            return false;
         }
         return player.hasPotionEffect(SLOW_FALLING_EFFECT_TYPE);
     }
 
     private boolean isPlayerGliding(Player player) {
         if (IS_GLIDING_METHOD == null) {
-            return false; // Méthode non disponible
+            return false;
         }
         try {
             return (boolean) IS_GLIDING_METHOD.invoke(player);
@@ -258,7 +256,6 @@ public class FlyChecks implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        // PlayerDataManager gère la suppression
     }
 
     @SuppressWarnings("deprecation")

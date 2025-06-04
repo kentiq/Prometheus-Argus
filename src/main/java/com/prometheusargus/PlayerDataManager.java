@@ -19,7 +19,7 @@ public class PlayerDataManager implements Listener {
         this.plugin = plugin;
         this.playerDataMap = new HashMap<>();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        if (plugin.isGlobalDebugModeEnabled()) { // Utiliser le getter pour globalDebugMode
+        if (plugin.isGlobalDebugModeEnabled()) {
             plugin.getLogger().info("[PlayerDataManager DEBUG] Initialized and events registered.");
         }
     }
@@ -27,8 +27,6 @@ public class PlayerDataManager implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        // Crée ou récupère les données. Si computeIfAbsent est utilisé dans getPlayerData,
-        // cette ligne assure juste que le log de join est présent.
         playerDataMap.put(player.getUniqueId(), new PlayerACData(player.getUniqueId()));
         if (plugin.isGlobalDebugModeEnabled()) {
             plugin.getLogger().info("[PlayerDataManager DEBUG] PlayerACData initialized for JOINING player: " + player.getName());
@@ -60,13 +58,11 @@ public class PlayerDataManager implements Listener {
         });
     }
 
-    // Cette méthode est moins utilisée directement par les checks, mais peut servir.
     public PlayerACData getPlayerData(UUID uuid) {
         Player player = plugin.getServer().getPlayer(uuid);
         if (player != null && player.isOnline()) {
-            return getPlayerData(player); // Utilise la logique computeIfAbsent
+            return getPlayerData(player);
         }
-        // Si le joueur est hors ligne, on retourne ce qu'on a, ou null.
         return playerDataMap.get(uuid);
     }
 }

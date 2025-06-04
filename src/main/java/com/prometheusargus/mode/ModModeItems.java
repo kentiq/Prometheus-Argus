@@ -20,7 +20,6 @@ public class ModModeItems {
     public static void giveModItems(Player player) {
         player.getInventory().clear();
         
-        // Bâton de Freeze Amélioré
         ItemStack freezeStick = createModItem(
             Material.BLAZE_ROD,
             ChatColor.RED + "Bâton de Freeze",
@@ -38,7 +37,6 @@ public class ModModeItems {
             true
         );
         
-        // Bâton de Téléportation Amélioré
         ItemStack teleportStick = createModItem(
             Material.ENDER_PEARL,
             ChatColor.AQUA + "Bâton de Téléportation",
@@ -56,7 +54,6 @@ public class ModModeItems {
             true
         );
         
-        // Bâton d'Inspection Amélioré
         ItemStack inspectStick = createModItem(
             Material.STICK,
             ChatColor.YELLOW + "Bâton d'Inspection",
@@ -74,7 +71,6 @@ public class ModModeItems {
             true
         );
         
-        // Bâton de Punition Amélioré
         ItemStack punishStick = createModItem(
             Material.BONE,
             ChatColor.LIGHT_PURPLE + "Bâton de Punition",
@@ -93,7 +89,6 @@ public class ModModeItems {
             true
         );
         
-        // Bâton de Surveillance Amélioré
         ItemStack monitorStick = createModItem(
             Material.EMERALD,
             ChatColor.GREEN + "Bâton de Surveillance",
@@ -111,7 +106,6 @@ public class ModModeItems {
             true
         );
         
-        // Bâton de Rappel Amélioré
         ItemStack recallStick = createModItem(
             Material.GOLDEN_CARROT,
             ChatColor.GOLD + "Bâton de Rappel",
@@ -129,7 +123,6 @@ public class ModModeItems {
             true
         );
 
-        // Menu de Sanctions
         ItemStack sanctionsMenu = createModItem(
             Material.BOOK,
             ChatColor.DARK_RED + "Menu de Sanctions",
@@ -146,7 +139,6 @@ public class ModModeItems {
             false
         );
         
-        // Ajouter les items à l'inventaire
         player.getInventory().setItem(0, freezeStick);
         player.getInventory().setItem(1, teleportStick);
         player.getInventory().setItem(2, inspectStick);
@@ -155,7 +147,6 @@ public class ModModeItems {
         player.getInventory().setItem(5, recallStick);
         player.getInventory().setItem(8, sanctionsMenu);
 
-        // Effets visuels pour le mode modération
         player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false, false));
     }
