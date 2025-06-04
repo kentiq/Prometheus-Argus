@@ -21,7 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.concurrent.TimeUnit; // <<< CORRECTION IMPORT AJOUTÉ <<<
+import java.util.concurrent.TimeUnit;
 
 public class ReportManager {
 
@@ -29,7 +29,7 @@ public class ReportManager {
     private File reportsFile;
     private FileConfiguration reportsConfig;
     private final Map<String, ReportEntry> activeReports = new LinkedHashMap<>(); 
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.FRENCH); // Ce champ n'est pas utilisé pour l'instant, mais on le garde.
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.FRENCH);
 
     public ReportManager(PrometheusArgus plugin) {
         this.plugin = plugin;
@@ -102,13 +102,6 @@ public class ReportManager {
             reportsConfig.set(path + "timestamp", report.getTimestamp().getTime());
             reportsConfig.set(path + "isOpen", report.isOpen());
         }
-        // Sauvegarder aussi les modifications des reports marqués comme fermés
-        // Si un report a été fermé, son état `isOpen` est mis à false dans reportsConfig
-        // avant d'appeler saveReports().
-        // Cette boucle met à jour tous les reports actifs. Si un report est fermé et retiré de activeReports,
-        // il ne sera pas mis à jour ici, mais sa valeur "isOpen: false" devrait déjà être dans reportsConfig.
-        // Pour être sûr, on peut parcourir les clés de reportsConfig et s'assurer que ceux non dans activeReports sont bien marqués fermés,
-        // mais loadReports() ne chargeant que les ouverts, cela devrait suffire pour la logique actuelle.
 
         try {
             reportsConfig.save(reportsFile);
@@ -123,7 +116,7 @@ public class ReportManager {
                 existingReport.getReporterUUID().equals(reporter.getUniqueId()) &&
                 existingReport.getReportedUUID().equals(reportedPlayer.getUniqueId()) &&
                 (System.currentTimeMillis() - existingReport.getTimestamp().getTime()) < TimeUnit.MINUTES.toMillis(plugin.getConfig().getInt("reports.cooldown_minutes", 5))) {
-                reporter.sendMessage(ChatColor.RED + "Vous avez déjà signalé ce joueur récemment."); // Message configurable
+                reporter.sendMessage(ChatColor.RED + "Vous avez déjà signalé ce joueur récemment.");
                 return null;
             }
         }
@@ -132,10 +125,6 @@ public class ReportManager {
         ReportEntry newReport = new ReportEntry(reportID, reporter.getUniqueId(), reporter.getName(),
                 reportedPlayer.getUniqueId(), reportedPlayer.getName(), reason, new Date(), true);
         
-        // Pour que les nouveaux reports apparaissent en premier dans le GUI (qui utilise getOpenReports qui trie par date)
-        // il est préférable d'ajouter puis de re-trier ou de s'assurer que la liste de base est bien ordonnée.
-        // LinkedHashMap maintient l'ordre d'insertion.
-        // Pour avoir les plus récents en "tête" de la map (important si on ne trie pas après) :
         Map<String, ReportEntry> tempMap = new LinkedHashMap<>();
         tempMap.put(reportID, newReport);
         tempMap.putAll(activeReports);
@@ -176,8 +165,6 @@ public class ReportManager {
     }
     
     public ReportEntry getReportById(String reportId) {
-        // Il faut chercher dans activeReports et potentiellement dans le fichier pour les reports fermés si on veut les récupérer par ID
-        // Pour l'instant, on ne cherche que dans les actifs (qui sont ouverts par défaut au chargement)
         return activeReports.get(reportId);
     }
 
@@ -185,14 +172,11 @@ public class ReportManager {
         ReportEntry report = activeReports.get(reportId);
         if (report != null && report.isOpen()) {
             report.setOpen(false); 
-            // Mettre à jour directement dans le fichier config
             reportsConfig.set("reports." + reportId + ".isOpen", false);
             reportsConfig.set("reports." + reportId + ".closedBy", staffName);
             reportsConfig.set("reports." + reportId + ".closedTimestamp", System.currentTimeMillis());
-            saveReports(); // Sauvegarder le changement dans le fichier
+            saveReports();
 
-            // Optionnel : retirer de activeReports pour qu'il ne soit plus dans la liste des "actifs" en mémoire jusqu'au prochain reload
-            // activeReports.remove(reportId); // Mais loadReports() ne rechargera que les "isOpen=true"
 
             if(plugin.isGlobalDebugModeEnabled()){
                 plugin.getLogger().info("[ReportManager] Report ID " + reportId + " closed by " + staffName);
@@ -233,7 +217,6 @@ public class ReportManager {
         public boolean isOpen() { return isOpen; }
         public void setOpen(boolean open) { isOpen = open; }
 
-        // Utiliser le SimpleDateFormat passé en argument ou celui de la classe externe
         public String getFormattedTimestamp(SimpleDateFormat sdf) {
             return sdf.format(timestamp);
         }

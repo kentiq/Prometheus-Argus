@@ -32,7 +32,7 @@ public class PlayerNotesManager {
         if (!notesFile.exists()) {
             try {
                 notesFile.getParentFile().mkdirs();
-                notesFile.createNewFile(); // Crée un fichier vide s'il n'existe pas
+                notesFile.createNewFile();
                 plugin.getLogger().info("Created playernotes.yml");
             } catch (IOException e) {
                 plugin.getLogger().severe("Could not create playernotes.yml: " + e.getMessage());
@@ -66,17 +66,16 @@ public class PlayerNotesManager {
         String formattedNote = String.format("[%s par %s] %s",
                 dateFormat.format(new Date()),
                 staffName,
-                ChatColor.stripColor(noteText) // On stocke le texte brut
+                ChatColor.stripColor(noteText)
         );
-        notes.add(0, formattedNote); // Ajouter au début pour les plus récentes en premier
+        notes.add(0, formattedNote);
 
-        // Optionnel: Limiter le nombre de notes par joueur
         int maxNotesPerPlayer = plugin.getConfig().getInt("notes.max_per_player", 20);
         while (notes.size() > maxNotesPerPlayer && maxNotesPerPlayer > 0) {
             notes.remove(notes.size() - 1);
         }
 
-        notesConfig.set("notes." + targetUUID.toString() + ".playerName", targetName); // Stocker le dernier nom connu
+        notesConfig.set("notes." + targetUUID.toString() + ".playerName", targetName);
         notesConfig.set("notes." + targetUUID.toString() + ".entries", notes);
         saveNotes();
         
@@ -99,21 +98,20 @@ public class PlayerNotesManager {
             return new ArrayList<>();
         }
 
-        if (itemsPerPage <= 0) itemsPerPage = 5; // Un nombre raisonnable pour l'affichage chat
+        if (itemsPerPage <= 0) itemsPerPage = 5;
         if (pageNum <= 0) pageNum = 1;
 
         int totalEntries = allNotes.size();
         int startIndex = (pageNum - 1) * itemsPerPage;
 
         if (startIndex >= totalEntries) {
-            return new ArrayList<>(); // Page vide
+            return new ArrayList<>();
         }
         
         int endIndex = Math.min(startIndex + itemsPerPage, totalEntries);
 
         List<String> pageNotes = new ArrayList<>();
         for (int i = startIndex; i < endIndex; i++) {
-            // Ajouter un numéro d'index global à la note pour faciliter la suppression
             pageNotes.add(ChatColor.GOLD + "#" + (totalEntries - i) + " " + ChatColor.GRAY + allNotes.get(i));
         }
         return pageNotes;
@@ -143,33 +141,17 @@ public class PlayerNotesManager {
             return null;
         }
 
-        // L'index est 1-based et correspond à l'affichage (plus récent = #1).
-        // Dans la liste, l'index 0 est le plus récent.
-        // Donc, une note avec l'index affiché 'k' est à notes.get(k-1) si on compte du plus ancien au plus récent.
-        // Mais nos notes sont stockées avec la plus récente à l'index 0.
-        // Si on affiche #1 comme la plus récente, et qu'elle est à l'index 0 de la liste:
-        // Index dans la liste = noteIndex - 1 (si noteIndex est 1-based et #1 est le plus récent)
-        // NON, c'est plus simple: l'index affiché #N (où N est le nombre total de notes - i de la boucle getNotes)
-        // Donc pour supprimer la note #ID, il faut trouver l'élément qui correspond à ID = totalNotes - list_index
-        // list_index = totalNotes - ID
 
-        int listIndexToRemove = notes.size() - noteIndex; // Convertit l'index public (1-based, #1 = plus ancienne si affichée dans l'ordre)
-                                                       // ou (1-based, #1 = plus récente si affichée dans l'ordre inversé)
-                                                       // Ici, on stocke le plus récent à l'index 0.
-                                                       // L'affichage donne #total - i, donc #1 est le dernier (plus ancien).
-                                                       // Si l'utilisateur veut supprimer #1 (le plus ancien), il faut supprimer notes.get(notes.size() - 1)
-                                                       // Si l'utilisateur veut supprimer #N (le N-ième plus ancien), il faut supprimer notes.get(notes.size() - N)
-                                                       // C'est équivalent à l'index (notes.size() - noteIndex)
+        int listIndexToRemove = notes.size() - noteIndex;
 
         if (listIndexToRemove < 0 || listIndexToRemove >= notes.size()) {
-            return null; // Index invalide
+            return null;
         }
 
         String removedNote = notes.remove(listIndexToRemove);
         notesConfig.set("notes." + targetUUID.toString() + ".entries", notes);
         saveNotes();
         
-        // Log optionnel de la suppression
         if(plugin.isGlobalDebugModeEnabled()){
             plugin.getLogger().info("[NotesManager] " + staffName + " removed note (index " + noteIndex + ") for player UUID " + targetUUID.toString() + ": " + removedNote);
         }

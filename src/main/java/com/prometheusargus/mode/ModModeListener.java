@@ -54,7 +54,6 @@ public class ModModeListener implements Listener {
         long timeLeft = (lastUse + (cooldownSeconds * 1000)) - System.currentTimeMillis();
         
         if (timeLeft > 0) {
-            // Mettre à jour la progression
             int progress = (int) ((cooldownSeconds * 1000 - timeLeft) * 100 / (cooldownSeconds * 1000));
             cooldownProgress.get(playerId).put(itemName, progress);
             return true;
@@ -176,7 +175,7 @@ public class ModModeListener implements Listener {
 
     private Player getTargetedPlayer(Player player) {
         Player target = null;
-        double maxDistance = 5.0; // Distance maximale pour cibler un joueur
+        double maxDistance = 5.0;
 
         for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
             if (onlinePlayer != player && onlinePlayer.getWorld() == player.getWorld()) {
@@ -193,8 +192,6 @@ public class ModModeListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerMove(PlayerMoveEvent event) {
-        // On ne bloque plus les mouvements en mode modérateur
-        // Le joueur peut se déplacer et regarder autour de lui librement
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

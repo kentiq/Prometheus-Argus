@@ -1,20 +1,20 @@
-package com.prometheusargus; // Package de base
+package com.prometheusargus;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer; // AJOUT
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.text.SimpleDateFormat; // AJOUT
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale; // AJOUT
+import java.util.Locale;
 import java.util.Map;
 
 public class StaffGUIManager {
@@ -24,10 +24,8 @@ public class StaffGUIManager {
     public static final String PLAYER_LIST_TITLE = ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Prometheus - Joueurs";
     public static final String PLAYER_INFO_TITLE_PREFIX = ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Prometheus - Infos "; 
     public static final String SANCTION_HISTORY_TITLE = ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Prometheus - Historique";
-    // >>> NOUVEAU TITRE POUR LE GUI DES REPORTS <<<
     public static final String REPORTS_LIST_TITLE = ChatColor.DARK_RED + "" + ChatColor.BOLD + "Prometheus - Signalements";
 
-    // Format de date pour l'affichage dans les GUIs
     private final SimpleDateFormat guiDateFormat = new SimpleDateFormat("dd/MM HH:mm", Locale.FRENCH);
 
 
@@ -41,14 +39,13 @@ public class StaffGUIManager {
         mainMenu.setItem(10, createGUIItem(Material.PAPER, ChatColor.GREEN + "Liste des Joueurs en Ligne",
                 Arrays.asList(ChatColor.GRAY + "Voir et inspecter les joueurs.")));
         
-        // >>> NOUVEL ITEM POUR LES REPORTS <<<
-        mainMenu.setItem(12, createGUIItem(Material.EMPTY_MAP, ChatColor.RED + "Signalements en Attente", // EMPTY_MAP ou NAME_TAG
+        mainMenu.setItem(12, createGUIItem(Material.EMPTY_MAP, ChatColor.RED + "Signalements en Attente",
                 Arrays.asList(ChatColor.GRAY + "Voir les signalements des joueurs.")));
 
         mainMenu.setItem(14, createGUIItem(Material.BOOK_AND_QUILL, ChatColor.GOLD + "Historique des Sanctions",
                 Arrays.asList(ChatColor.GRAY + "Consulter les sanctions enregistrées.")));
 
-        mainMenu.setItem(16, createGUIItem(Material.COMPASS, ChatColor.AQUA + "Statistiques Anti-Cheat", // Décalé
+        mainMenu.setItem(16, createGUIItem(Material.COMPASS, ChatColor.AQUA + "Statistiques Anti-Cheat",
                 Arrays.asList(ChatColor.GRAY + "Voir les statistiques de détection.")));
         
         ItemStack placeholder = createGUIItem(Material.STAINED_GLASS_PANE, " ", null, (short) 7); 
@@ -64,7 +61,6 @@ public class StaffGUIManager {
         staffPlayer.openInventory(mainMenu);
     }
 
-    // openPlayerListMenu (inchangé)
     public void openPlayerListMenu(Player staffPlayer, int page) {
         List<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
 
@@ -97,7 +93,7 @@ public class StaffGUIManager {
                 lore.add(ChatColor.YELLOW + "Clic Gauche: Inspecter");
                 lore.add(ChatColor.AQUA + "Clic Droit: Téléporter (Admin)");
 
-                playerListMenu.setItem(i, createPlayerHeadItem(targetPlayer.getName(), ChatColor.WHITE + targetPlayer.getName(), lore)); // Modifié pour prendre le nom
+                playerListMenu.setItem(i, createPlayerHeadItem(targetPlayer.getName(), ChatColor.WHITE + targetPlayer.getName(), lore));
             } else {
                 break; 
             }
@@ -119,7 +115,6 @@ public class StaffGUIManager {
     }
 
 
-    // openPlayerInfoMenu (inchangé pour l'instant, on pourrait ajouter des boutons d'action plus tard)
     public void openPlayerInfoMenu(Player staffPlayer, Player targetPlayer) {
         PlayerACData acData = plugin.getPlayerDataManager().getPlayerData(targetPlayer);
         if (acData == null) {
@@ -130,7 +125,7 @@ public class StaffGUIManager {
 
         Inventory playerInfoMenu = Bukkit.createInventory(null, 54, PLAYER_INFO_TITLE_PREFIX + targetPlayer.getName());
 
-        playerInfoMenu.setItem(4, createPlayerHeadItem(targetPlayer.getName(), ChatColor.GOLD + targetPlayer.getName(), Arrays.asList( // Modifié
+        playerInfoMenu.setItem(4, createPlayerHeadItem(targetPlayer.getName(), ChatColor.GOLD + targetPlayer.getName(), Arrays.asList(
                 ChatColor.GRAY + "Ping: " + getPing(targetPlayer) + "ms",
                 ChatColor.GRAY + "Monde: " + targetPlayer.getWorld().getName(),
                 ChatColor.GRAY + "Position: " + String.format("%.1f, %.1f, %.1f", targetPlayer.getLocation().getX(), targetPlayer.getLocation().getY(), targetPlayer.getLocation().getZ()),
@@ -183,7 +178,6 @@ public class StaffGUIManager {
         staffPlayer.openInventory(playerInfoMenu);
     }
     
-    // openSanctionHistoryMenu (inchangé)
     public void openSanctionHistoryMenu(Player staffPlayer, int page) {
         List<String> historyEntries = plugin.getSanctionHistoryManager().getFormattedHistory(45, page);
         int totalSanctions = plugin.getSanctionHistoryManager().getTotalSanctions();
@@ -216,11 +210,10 @@ public class StaffGUIManager {
         staffPlayer.openInventory(historyMenu);
     }
 
-    // >>> NOUVELLE MÉTHODE POUR LE GUI DES REPORTS <<<
     public void openReportsMenu(Player staffPlayer, int page) {
-        List<ReportManager.ReportEntry> openReports = plugin.getReportManager().getOpenReports(); // Récupère les reports ouverts
+        List<ReportManager.ReportEntry> openReports = plugin.getReportManager().getOpenReports();
         
-        int reportsPerPage = 45; // Max items dans un grand inventaire (54 - 9 pour la nav)
+        int reportsPerPage = 45;
         int totalReports = openReports.size();
         int totalPages = Math.max(1, (int) Math.ceil((double) totalReports / reportsPerPage));
         page = Math.max(1, Math.min(page, totalPages));
@@ -245,7 +238,6 @@ public class StaffGUIManager {
                     lore.add(ChatColor.GRAY + "Date: " + ChatColor.AQUA + report.getFormattedTimestamp(guiDateFormat));
                     lore.add(ChatColor.DARK_GRAY + "--------------------");
                     lore.add(ChatColor.WHITE + "Raison: ");
-                    // Gérer les raisons longues
                     String reason = report.getReason();
                     final int MAX_LINE_LENGTH = 35;
                     while (reason.length() > MAX_LINE_LENGTH) {
@@ -259,12 +251,10 @@ public class StaffGUIManager {
                     lore.add(ChatColor.YELLOW + "Clic Gauche: Se TP au joueur signalé (si en ligne)");
                     lore.add(ChatColor.GREEN + "Clic Droit: Marquer comme traité (fermer)");
                     lore.add(ChatColor.AQUA + "Clic Molette: Voir profil du signalé");
-                    // Stocker l'ID du report dans le lore pour le récupérer facilement (caché ou visible)
                     lore.add(ChatColor.DARK_GRAY + "ID: " + report.getReportID());
 
 
                     ItemStack reportItem;
-                    // Essayer de prendre la tête du joueur signalé, sinon un item par défaut
                     if (reportedOfflinePlayer.hasPlayedBefore() || reportedOfflinePlayer.isOnline()) {
                         reportItem = createPlayerHeadItem(reportedPlayerNameDisplay, ChatColor.GOLD + "Report: " + reportedPlayerNameDisplay, lore);
                     } else {
@@ -277,7 +267,6 @@ public class StaffGUIManager {
             }
         }
 
-        // Pagination
         if (page > 1) {
             reportsMenu.setItem(45, createGUIItem(Material.ARROW, ChatColor.YELLOW + "◄ Page Précédente (" + (page - 1) + ")", null));
         } else {
@@ -294,7 +283,6 @@ public class StaffGUIManager {
     }
 
 
-    // Méthodes utilitaires createGUIItem (inchangées)
     public static ItemStack createGUIItem(Material material, String name, List<String> lore, short durability) {
         ItemStack item = new ItemStack(material, 1, durability);
         ItemMeta meta = item.getItemMeta();
@@ -311,12 +299,11 @@ public class StaffGUIManager {
         return createGUIItem(material, name, lore, (short) 0);
     }
 
-    // Modifié pour prendre le nom du joueur (peut être un OfflinePlayer)
     public static ItemStack createPlayerHeadItem(String playerName, String name, List<String> lore) {
         ItemStack playerHead = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
         SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
         if (skullMeta != null) {
-            skullMeta.setOwner(playerName); // Utilise le nom pour la tête
+            skullMeta.setOwner(playerName);
             skullMeta.setDisplayName(name);
             if (lore != null) {
                 skullMeta.setLore(lore);
@@ -326,7 +313,6 @@ public class StaffGUIManager {
         return playerHead;
     }
 
-    // getPing (inchangé)
     private int getPing(Player player) {
         try {
             Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);

@@ -1,4 +1,4 @@
-package com.prometheusargus; // Package de base
+package com.prometheusargus;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class SanctionHistoryManager {
 
-    private final PrometheusArgus plugin; // Champ d'instance
+    private final PrometheusArgus plugin;
     private File historyFile;
     private FileConfiguration historyConfig;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.FRENCH);
@@ -172,19 +172,19 @@ public class SanctionHistoryManager {
         public static SanctionEntry fromString(String entryStr) {
             try {
                 String[] partsDateTimeAndRest = entryStr.split(" - Joueur: ", 2);
-                if (partsDateTimeAndRest.length < 2) return null; // CORRIGÉ: Vérification
+                if (partsDateTimeAndRest.length < 2) return null;
                 String date = partsDateTimeAndRest[0];
                 
                 String[] partsPlayerAndRest = partsDateTimeAndRest[1].split(" - Type: ", 2);
-                if (partsPlayerAndRest.length < 2) return null; // CORRIGÉ: Vérification
+                if (partsPlayerAndRest.length < 2) return null;
                 String playerName = partsPlayerAndRest[0];
                 
                 String[] partsTypeAndRest = partsPlayerAndRest[1].split(" - Par: ", 2);
-                if (partsTypeAndRest.length < 2) return null; // CORRIGÉ: Vérification
+                if (partsTypeAndRest.length < 2) return null;
                 String type = partsTypeAndRest[0];
                 
                 String[] partsExecutorAndRest = partsTypeAndRest[1].split(" - ", 2); 
-                if (partsExecutorAndRest.length < 2) return null; // CORRIGÉ: Vérification
+                if (partsExecutorAndRest.length < 2) return null;
                 String executor = partsExecutorAndRest[0];
                 
                 String reasonPart = partsExecutorAndRest[1];
@@ -193,22 +193,17 @@ public class SanctionHistoryManager {
 
                 if (reasonPart.startsWith("VL: ")) {
                     String[] vlAndReasonParts = reasonPart.substring(4).split(" - Raison: ", 2);
-                    if (vlAndReasonParts.length < 2) return null; // CORRIGÉ: Vérification
+                    if (vlAndReasonParts.length < 2) return null;
                     vl = Integer.parseInt(vlAndReasonParts[0]);
                     reason = vlAndReasonParts[1];
                 } else if (reasonPart.startsWith("Raison: ")) {
                     reason = reasonPart.substring(8);
                 } else { 
-                    // CORRIGÉ: Ligne problématique supprimée/commentée
-                    // Si on veut un log ici, il faudrait un logger statique ou remonter l'erreur.
-                    // Pour l'instant, on retourne null pour indiquer un échec de parsing.
-                    // System.out.println("[Prometheus DEBUG - SanctionEntry] Could not fully parse reason/VL from: " + reasonPart + " in entry: " + entryStr);
                     return null; 
                 }
                 
                 return new SanctionEntry(date, playerName, type, executor, reason, vl, entryStr);
             } catch (Exception e) {
-                // System.err.println("Error parsing sanction entry: " + entryStr + " | " + e.getMessage());
                 return null; 
             }
         }

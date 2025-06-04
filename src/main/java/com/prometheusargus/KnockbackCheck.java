@@ -4,7 +4,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-// import org.bukkit.block.BlockFace; // Non utilisé directement, mais pourrait l'être pour des checks d'obstruction plus avancés
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -25,7 +24,6 @@ public class KnockbackCheck implements Listener {
     private final PrometheusArgus plugin;
     private final boolean DEBUG_MODE;
 
-    // Configuration
     private final double MIN_EXPECTED_KB_XZ_TO_CHECK;
     private final double MIN_KB_RATIO_TAKEN;
     private final int KB_CHECK_TICKS_WINDOW;
@@ -61,7 +59,6 @@ public class KnockbackCheck implements Listener {
         }
 
         EntityDamageEvent.DamageCause cause = event.getCause();
-        // Enhanced cause filtering
         switch (cause) {
             case FALL:
             case DROWNING:
@@ -71,11 +68,8 @@ public class KnockbackCheck implements Listener {
             case WITHER:
             case FIRE_TICK:
             case VOID:
-            // For 1.9+, handled by isPost1_9() check later
-            // case FLY_INTO_WALL: 
                 return;
             default:
-                // Continue for other causes like ENTITY_ATTACK, PROJECTILE, BLOCK_EXPLOSION, ENTITY_EXPLOSION, etc.
                 break;
         }
         if (isPost1_9() && cause.name().equals("FLY_INTO_WALL")) {
@@ -84,7 +78,6 @@ public class KnockbackCheck implements Listener {
         
         if (victim.getLocation().getBlock().isLiquid() || victim.getLocation().getBlock().getType() == Material.WEB || isObstructed(victim, event)) {
             if (DEBUG_MODE) plugin.getLogger().info("[KnockbackCheck DEBUG] " + victim.getName() + " obstructed or in fluid/web. KB check may be lenient or skipped.");
-            // Optionally, you could set a flag in acData here to make the move check more lenient
         }
 
         acData.lastDamageTime = System.currentTimeMillis();
@@ -109,7 +102,7 @@ public class KnockbackCheck implements Listener {
             if(damager != victim) {
                 damageDirection = victim.getLocation().toVector().subtract(damager.getLocation().toVector());
                 damageDirection.setY(0);
-                if (damageDirection.lengthSquared() > 0.001) { // Check for non-zero length before normalizing
+                if (damageDirection.lengthSquared() > 0.001) {
                     damageDirection.normalize();
                 } else { 
                     damageDirection = victim.getLocation().getDirection().multiply(-1).setY(0).normalize();
@@ -206,7 +199,7 @@ public class KnockbackCheck implements Listener {
              if (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Entity) {
                 damager = (Entity) ((Arrow) damager).getShooter();
             }
-             if (damager == player) return false; // Can't be obstructed by self
+             if (damager == player) return false;
             kbDir = player.getLocation().toVector().subtract(damager.getLocation().toVector()).setY(0);
         } else {
             return false;
@@ -230,13 +223,10 @@ public class KnockbackCheck implements Listener {
     }
 
     private boolean isSolidBlockAt(Block block){
-        // Material.isSolid() is generally good for 1.8.
-        // Some non-solid blocks still provide collision (fences, panes, etc.)
-        // but for basic obstruction, isSolid() is a starting point.
         return block.getType().isSolid() && 
                block.getType() != Material.SIGN_POST && 
                block.getType() != Material.WALL_SIGN &&
-               block.getType() != Material.AIR; // Ensure AIR is not considered solid
+               block.getType() != Material.AIR;
     }
 
     @EventHandler
@@ -258,12 +248,8 @@ public class KnockbackCheck implements Listener {
     
     private boolean isPost1_9() {
         try {
-            // Attempt to get the ELYTRA material by name to avoid compile-time error
-            // Material.ELYTRA.getClass(); // This would cause a compile error on older APIs
             return Material.getMaterial("ELYTRA") != null;
         } catch (Throwable e) { 
-            // This catch block might not even be necessary anymore with getMaterial,
-            // but we'll keep it for safety or if other checks were intended here.
             return false;
         }
     }

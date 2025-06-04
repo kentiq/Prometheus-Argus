@@ -1,9 +1,9 @@
-package com.prometheusargus; // Package de base
+package com.prometheusargus;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer; // AJOUT
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,9 +11,9 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta; // AJOUT si manquant, mais devrait y être
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.List; // AJOUT
+import java.util.List;
 
 public class GUIListeners implements Listener {
 
@@ -34,21 +34,18 @@ public class GUIListeners implements Listener {
         ItemStack clickedItem = event.getCurrentItem();
 
         if (clickedInventory == null || clickedItem == null || clickedItem.getType() == Material.AIR) {
-             // Annuler si on clique dans un slot vide de nos GUIs spécifiques
             if (clickedInventory != null && 
                 (clickedInventory.getTitle().equals(StaffGUIManager.MAIN_MENU_TITLE) ||
                  clickedInventory.getTitle().startsWith(StaffGUIManager.PLAYER_LIST_TITLE) ||
                  clickedInventory.getTitle().startsWith(StaffGUIManager.PLAYER_INFO_TITLE_PREFIX) ||
                  clickedInventory.getTitle().startsWith(StaffGUIManager.SANCTION_HISTORY_TITLE) ||
-                 clickedInventory.getTitle().startsWith(StaffGUIManager.REPORTS_LIST_TITLE) )) { // AJOUT REPORTS_LIST_TITLE
+                 clickedInventory.getTitle().startsWith(StaffGUIManager.REPORTS_LIST_TITLE) )) {
                 event.setCancelled(true);
             }
             return;
         }
         
-        // Vérifier si l'item a un nom seulement s'il n'est pas un placeholder qu'on veut quand même annuler
         if (!clickedItem.hasItemMeta() || !clickedItem.getItemMeta().hasDisplayName()) {
-            // Si c'est un item sans nom (comme une vitre de placeholder avec nom vide) dans nos GUIs, on annule aussi
              if (clickedInventory.getTitle().equals(StaffGUIManager.MAIN_MENU_TITLE) ||
                  clickedInventory.getTitle().startsWith(StaffGUIManager.PLAYER_LIST_TITLE) ||
                  clickedInventory.getTitle().startsWith(StaffGUIManager.PLAYER_INFO_TITLE_PREFIX) ||
@@ -68,7 +65,7 @@ public class GUIListeners implements Listener {
             event.setCancelled(true);
             if (itemDisplayName.contains("Liste des Joueurs")) {
                 guiManager.openPlayerListMenu(staffPlayer, 1);
-            } else if (itemDisplayName.contains("Signalements en Attente")) { // <<< NOUVELLE CONDITION
+            } else if (itemDisplayName.contains("Signalements en Attente")) {
                 guiManager.openReportsMenu(staffPlayer, 1);
             } else if (itemDisplayName.contains("Historique des Sanctions")) {
                 guiManager.openSanctionHistoryMenu(staffPlayer, 1);
@@ -82,7 +79,6 @@ public class GUIListeners implements Listener {
         }
 
         if (inventoryTitle.startsWith(StaffGUIManager.PLAYER_LIST_TITLE)) {
-            // ... (Logique existante pour PLAYER_LIST_TITLE - INCHANGÉE) ...
             event.setCancelled(true);
             int currentPage = 1;
             try {
@@ -123,7 +119,6 @@ public class GUIListeners implements Listener {
         }
         
         if (inventoryTitle.startsWith(StaffGUIManager.PLAYER_INFO_TITLE_PREFIX)) {
-            // ... (Logique existante pour PLAYER_INFO_TITLE_PREFIX - INCHANGÉE) ...
             event.setCancelled(true);
             String targetPlayerNameFromTitle = inventoryTitle.substring(StaffGUIManager.PLAYER_INFO_TITLE_PREFIX.length()).trim();
 
@@ -146,7 +141,6 @@ public class GUIListeners implements Listener {
         }
 
         if (inventoryTitle.startsWith(StaffGUIManager.SANCTION_HISTORY_TITLE)) {
-            // ... (Logique existante pour SANCTION_HISTORY_TITLE - INCHANGÉE) ...
              event.setCancelled(true);
             int currentPage = 1;
             try {
@@ -171,10 +165,9 @@ public class GUIListeners implements Listener {
             return;
         }
 
-        // >>> NOUVELLE LOGIQUE POUR LE GUI DES REPORTS <<<
         if (inventoryTitle.startsWith(StaffGUIManager.REPORTS_LIST_TITLE)) {
             event.setCancelled(true);
-            int currentPage = 1; // Default page
+            int currentPage = 1;
              try {
                 String titlePart = inventoryTitle.substring(StaffGUIManager.REPORTS_LIST_TITLE.length()); 
                 if (titlePart.contains("Page ") && titlePart.contains("/")) {
@@ -185,7 +178,7 @@ public class GUIListeners implements Listener {
                  if(plugin.isGlobalDebugModeEnabled()) plugin.getLogger().warning("Could not parse page from ReportsList GUI title: " + inventoryTitle);
             }
 
-            if (clickedItem.getType() == Material.SKULL_ITEM || clickedItem.getType() == Material.PAPER && clickedItem.getItemMeta().hasLore()) { // Item de report (tête ou papier)
+            if (clickedItem.getType() == Material.SKULL_ITEM || clickedItem.getType() == Material.PAPER && clickedItem.getItemMeta().hasLore()) {
                 List<String> lore = clickedItem.getItemMeta().getLore();
                 String reportId = null;
                 String reportedPlayerName = null;
@@ -200,16 +193,16 @@ public class GUIListeners implements Listener {
                     }
                 }
 
-                if (reportedPlayerName == null) { // Failsafe, essayer de prendre le nom de l'item
+                if (reportedPlayerName == null) {
                     reportedPlayerName = ChatColor.stripColor(itemDisplayName).replace("Report: ", "");
                 }
                 
-                OfflinePlayer reportedOfflinePlayer = Bukkit.getOfflinePlayer(reportedPlayerName); // Nécessaire pour UUID
+                OfflinePlayer reportedOfflinePlayer = Bukkit.getOfflinePlayer(reportedPlayerName);
 
-                if (event.getClick() == ClickType.LEFT) { // Se TP au joueur signalé (si en ligne)
+                if (event.getClick() == ClickType.LEFT) {
                     if (reportedOfflinePlayer.isOnline()) {
                         Player targetOnline = reportedOfflinePlayer.getPlayer();
-                        if (staffPlayer.hasPermission("prometheusargus.staff.teleport")) { // Utiliser une permission existante ou créer une nouvelle
+                        if (staffPlayer.hasPermission("prometheusargus.staff.teleport")) {
                             staffPlayer.teleport(targetOnline);
                             staffPlayer.sendMessage(ChatColor.GREEN + "Téléporté à " + targetOnline.getName() + " (signalé).");
                             staffPlayer.closeInventory();
@@ -219,12 +212,12 @@ public class GUIListeners implements Listener {
                     } else {
                         staffPlayer.sendMessage(ChatColor.RED + "Le joueur signalé " + reportedPlayerName + " n'est pas en ligne.");
                     }
-                } else if (event.getClick() == ClickType.RIGHT) { // Marquer comme traité
+                } else if (event.getClick() == ClickType.RIGHT) {
                     if (reportId != null && staffPlayer.hasPermission("prometheusargus.reports.manage")) {
                         boolean closed = plugin.getReportManager().closeReport(reportId, staffPlayer.getName());
                         if (closed) {
                             staffPlayer.sendMessage(ChatColor.GREEN + "Signalement ID " + reportId + " marqué comme traité.");
-                            guiManager.openReportsMenu(staffPlayer, currentPage); // Rafraîchir le GUI
+                            guiManager.openReportsMenu(staffPlayer, currentPage);
                         } else {
                             staffPlayer.sendMessage(ChatColor.RED + "Impossible de fermer le signalement ID " + reportId + " (déjà traité ou introuvable).");
                         }
@@ -233,7 +226,7 @@ public class GUIListeners implements Listener {
                     } else {
                          staffPlayer.sendMessage(ChatColor.RED + "Vous n'avez pas la permission de gérer les signalements.");
                     }
-                } else if (event.getClick() == ClickType.MIDDLE) { // Voir profil du signalé
+                } else if (event.getClick() == ClickType.MIDDLE) {
                     staffPlayer.performCommand("pa lookup " + reportedPlayerName);
                     staffPlayer.closeInventory();
                 }

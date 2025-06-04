@@ -24,7 +24,6 @@ public class SanctionsGUI {
     public static void openSanctionsGUI(Player moderator, Player target) {
         Inventory gui = Bukkit.createInventory(null, GUI_SIZE, GUI_TITLE);
 
-        // Tête du joueur ciblé
         ItemStack targetHead = createPlayerHead(
             target.getName(),
             ChatColor.YELLOW + "Joueur: " + ChatColor.WHITE + target.getName(),
@@ -41,7 +40,6 @@ public class SanctionsGUI {
         );
         gui.setItem(4, targetHead);
 
-        // Sanctions rapides
         gui.setItem(19, createSanctionItem(
             Material.BARRIER,
             ChatColor.RED + "Kick",
@@ -95,7 +93,6 @@ public class SanctionsGUI {
             )
         ));
 
-        // Templates de sanctions
         gui.setItem(37, createSanctionItem(
             Material.BOOK,
             ChatColor.GREEN + "Templates",
@@ -112,7 +109,6 @@ public class SanctionsGUI {
             )
         ));
 
-        // Historique des sanctions
         gui.setItem(39, createSanctionItem(
             Material.WATCH,
             ChatColor.AQUA + "Historique",
@@ -128,7 +124,6 @@ public class SanctionsGUI {
             )
         ));
 
-        // Notes et commentaires
         gui.setItem(41, createSanctionItem(
             Material.BOOK_AND_QUILL,
             ChatColor.LIGHT_PURPLE + "Notes",
@@ -144,7 +139,6 @@ public class SanctionsGUI {
             )
         ));
 
-        // Fermer le menu
         gui.setItem(49, createSanctionItem(
             Material.BARRIER,
             ChatColor.RED + "Fermer",
@@ -182,12 +176,10 @@ public class SanctionsGUI {
     }
 
     private static String getPlayTime(Player player) {
-        // TODO: Implémenter la logique pour obtenir le temps de jeu
         return "Non disponible";
     }
 
     private static String getLastLogin(Player player) {
-        // TODO: Implémenter la logique pour obtenir la dernière connexion
         return "Maintenant";
     }
 } 

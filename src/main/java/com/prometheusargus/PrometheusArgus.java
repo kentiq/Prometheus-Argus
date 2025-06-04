@@ -1,15 +1,14 @@
-package com.prometheusargus; // Package de base
+package com.prometheusargus;
 
-// Imports existants et nécessaires
-import com.prometheusargus.SpeedCheck; // Assure-toi que SpeedCheck est dans ce package
+import com.prometheusargus.SpeedCheck;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
-import org.bukkit.BanList; // Utilisation explicite
-import org.bukkit.FireworkEffect.Type; // Utilisation explicite
+import org.bukkit.BanList;
+import org.bukkit.FireworkEffect.Type;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -19,11 +18,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent; // AJOUTÉ
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent; // AJOUTÉ
-import org.bukkit.event.player.PlayerTeleportEvent; // AJOUTÉ
-import org.bukkit.event.player.PlayerVelocityEvent; // AJOUTÉ
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -55,7 +54,6 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
     private ModModeManager modModeManager;
     private FileConfiguration modModeConfig;
 
-    // Configs pour les checks existants
     private int reachA_VlAlertLow, reachA_VlAlertMedium, reachA_VlAlertHigh, reachA_VlBanThreshold;
     private String reachA_BanReason;
     private int nofallA_VlAlertLow, nofallA_VlAlertMedium, nofallA_VlBanThreshold;
@@ -67,7 +65,6 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
     private int knockbackA_VlAlertLow, knockbackA_VlAlertMedium, knockbackA_VlBanThreshold;
     private String knockbackA_BanReason;
 
-    // NOUVELLES CONFIGS POUR SPEED (à initialiser dans loadConfigValues)
     private int speedA_VlAlertLow, speedA_VlAlertMedium, speedA_VlAlertHigh, speedA_VlBanThresholdConfig;
     private String speedA_BanReasonConfig;
     private int speedB_VlAlertLow, speedB_VlAlertMedium, speedB_VlAlertHigh, speedB_VlBanThresholdConfig;
@@ -84,7 +81,7 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        loadConfigValues(); // Doit être appelé tôt
+        loadConfigValues();
 
         this.globalDebugMode = getConfig().getBoolean("global_debug_mode", false);
         if (globalDebugMode) getLogger().info("[Prometheus DEBUG] Global Debug Mode is ENABLED.");
@@ -120,7 +117,6 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
             getLogger().severe("Prometheus Argus pourrait ne pas fonctionner correctement.");
         }
 
-        // Initialisation des checks existants (en supposant qu'ils sont dans le package com.prometheusargus)
         if (getConfig().getBoolean("checks.reach_a.enabled", true)) new ReachCheckA(this);
         if (getConfig().getBoolean("checks.nofall_a.enabled", true)) new NoFallCheck_CustomFall(this);
         if (getConfig().getBoolean("checks.fly_a.enabled", true) || getConfig().getBoolean("checks.fly_b_glide.enabled", true)) {
@@ -128,10 +124,7 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         }
         if (getConfig().getBoolean("checks.knockback_a.enabled", true)) new KnockbackCheck(this);
         
-        // AJOUT: Initialisation de SpeedCheck
-        if (getConfig().getBoolean("checks.speed.enabled", true)) { // Option globale pour les checks de speed
-            // Assurez-vous que SpeedCheck est dans le package com.prometheusargus.checks
-            // ou ajustez l'import et cette ligne.
+        if (getConfig().getBoolean("checks.speed.enabled", true)) {
             new SpeedCheck(this); 
             if (globalDebugMode) getLogger().info("[Prometheus DEBUG] SpeedCheck initialized.");
         }
@@ -141,7 +134,7 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         if (globalDebugMode) getLogger().info("[Prometheus DEBUG] Ensuring PlayerACData for already online players...");
         if (playerDataManager != null) {
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                initPlayerData(onlinePlayer); // MODIFIÉ: Appel de la méthode d'initialisation
+                initPlayerData(onlinePlayer);
             }
         } else {
              if (globalDebugMode) getLogger().warning("[Prometheus DEBUG] PlayerDataManager was null during onEnable, cannot init ACData for online players.");
@@ -154,24 +147,19 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         getLogger().info("Développé par Kentiq.");
         getLogger().info("========================================");
 
-        // Initialisation du mode modérateur
         setupModMode();
     }
 
     private void setupModMode() {
-        // Créer le fichier modmode.yml s'il n'existe pas
         File modModeFile = new File(getDataFolder(), "modmode.yml");
         if (!modModeFile.exists()) {
             saveResource("modmode.yml", false);
         }
         
-        // Charger la configuration
         modModeConfig = YamlConfiguration.loadConfiguration(modModeFile);
         
-        // Initialiser le ModModeManager avec la configuration
         modModeManager = new ModModeManager(this);
         
-        // Enregistrer les événements
         getServer().getPluginManager().registerEvents(new ModModeListener(this, modModeManager), this);
         
         getLogger().info("[ModMode] Initialisé avec succès");
@@ -185,44 +173,32 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         return modModeConfig;
     }
 
-    // AJOUT: Méthode pour initialiser/mettre à jour PlayerACData lors de la connexion ou du rechargement
     private void initPlayerData(Player player) {
         if (playerDataManager == null) {
              if (globalDebugMode) getLogger().warning("[Prometheus DEBUG] PlayerDataManager is null in initPlayerData for " + player.getName());
             return;
         }
-        PlayerACData acData = playerDataManager.getPlayerData(player); // Ceci va créer les données si elles n'existent pas
+        PlayerACData acData = playerDataManager.getPlayerData(player);
 
-        // Initialiser les champs de mouvement si c'est la première fois ou après un rechargement
-        // Si getLastMoveLocation est null, cela signifie probablement que les données viennent d'être créées
-        // ou qu'un rechargement a eu lieu et n'a pas persisté cet état.
         if (acData.getLastMoveLocation() == null && player.getLocation() != null) {
             acData.setLastMoveLocation(player.getLocation());
         }
-        // Si lastMoveTime est 0 (valeur par défaut si non initialisé), mettre à jour.
         if (acData.getLastMoveTime() == 0) { 
-            acData.setLastMoveTime(System.currentTimeMillis() - 50); // Léger décalage pour éviter timeDiff de 0
+            acData.setLastMoveTime(System.currentTimeMillis() - 50);
         }
-        // S'assurer que wasOnGroundSpeed est cohérent avec l'état actuel pour le premier check.
-        // player.isOnGround() est deprecated mais fonctionne en 1.8.8.
-        // Si vous avez une méthode custom plus fiable (comme isOnGroundCustom dans SpeedCheck),
-        // il serait mieux de l'utiliser ici aussi, mais cela demanderait de la rendre accessible.
         acData.setWasOnGroundSpeed(player.isOnGround());
 
-        // Pour FlyChecks, s'assurer que les positions Y sont initialisées si ce n'est pas déjà fait
         if (player.getLocation() != null) {
-            if (acData.lastYPositionFly == 0.0 && acData.highestYReachedInAir == 0.0) { // Condition pour initialisation unique
+            if (acData.lastYPositionFly == 0.0 && acData.highestYReachedInAir == 0.0) {
                 acData.lastYPositionFly = player.getLocation().getY();
                 acData.highestYReachedInAir = player.getLocation().getY();
             }
-            // lastOnGroundLocation est crucial pour NoFall et Fly
             if (acData.lastOnGroundLocation == null && player.isOnGround()) {
                 acData.lastOnGroundLocation = player.getLocation();
             }
         }
     }
 
-    // --- Getters (INCHANGÉS PAR RAPPORT À TA VERSION) ---
     public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
     public SanctionHistoryManager getSanctionHistoryManager() { return sanctionHistoryManager; }
     public FreezeManager getFreezeManager() { return freezeManager; }
@@ -232,18 +208,16 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
     public StaffChatManager getStaffChatManager() { return staffChatManager; }
     public StaffGUIManager getStaffGUIManager() { return staffGUIManager; }
     public boolean isGlobalDebugModeEnabled() { return globalDebugMode; }
-    // --- FIN DES GETTERS ---
 
 
     private void loadConfigValues() {
-        // Configs existantes (INCHANGÉES PAR RAPPORT À TA VERSION)
         reachA_VlAlertLow = getConfig().getInt("checks.reach_a.thresholds.low", 5);
         reachA_VlAlertMedium = getConfig().getInt("checks.reach_a.thresholds.medium", 10);
         reachA_VlAlertHigh = getConfig().getInt("checks.reach_a.thresholds.high", 15);
         reachA_VlBanThreshold = getConfig().getInt("checks.reach_a.ban.threshold", 20);
         reachA_BanReason = getConfig().getString("checks.reach_a.ban.reason", "&cPrometheus Argus: Tricherie détectée (Reach)");
 
-        nofallA_VlAlertLow = getConfig().getInt("checks.nofall_a.thresholds.low", 8); // Ajusté selon ton dernier config.yml
+        nofallA_VlAlertLow = getConfig().getInt("checks.nofall_a.thresholds.low", 8);
         nofallA_VlAlertMedium = getConfig().getInt("checks.nofall_a.thresholds.medium", 16);
         nofallA_VlBanThreshold = getConfig().getInt("checks.nofall_a.ban.threshold", 24);
         nofallA_BanReason = getConfig().getString("checks.nofall_a.ban.reason", "&cPrometheus Argus: Tricherie détectée (NoFall Calc.)");
@@ -264,7 +238,6 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         knockbackA_VlBanThreshold = getConfig().getInt(kbPath + "ban.threshold", 12);
         knockbackA_BanReason = getConfig().getString(kbPath + "ban.reason", "&cPrometheus Argus: Tricherie détectée (Anti-Knockback)");
 
-        // AJOUT: Lecture des configurations pour Speed
         speedA_VlAlertLow = getConfig().getInt("checks.speed_a.thresholds.low", 5);
         speedA_VlAlertMedium = getConfig().getInt("checks.speed_a.thresholds.medium", 10);
         speedA_VlAlertHigh = getConfig().getInt("checks.speed_a.thresholds.high", 15);
@@ -301,7 +274,6 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
                              ", Window=" + getConfig().getInt(kbPath + "check_ticks_window", 4) +
                              ", VLInc=" + getConfig().getInt(kbPath + "vl_increment", 2) +
                              ", LowVL=" + knockbackA_VlAlertLow + ", MedVL=" + knockbackA_VlAlertMedium + ", BanVL=" + knockbackA_VlBanThreshold);
-            // AJOUT: Logs pour les configs Speed
             getLogger().info("[Config] SpeedA: VLs Low=" + speedA_VlAlertLow + ", Med=" + speedA_VlAlertMedium + ", High=" + speedA_VlAlertHigh + ", Ban=" + speedA_VlBanThresholdConfig);
             getLogger().info("[Config] SpeedB_Jump: VLs Low=" + speedB_VlAlertLow + ", Med=" + speedB_VlAlertMedium + ", High=" + speedB_VlAlertHigh + ", Ban=" + speedB_VlBanThresholdConfig);
             getLogger().info("[Config] SpeedC_Packet: VLs Low=" + speedC_VlAlertLow + ", Med=" + speedC_VlAlertMedium + ", High=" + speedC_VlAlertHigh + ", Ban=" + speedC_VlBanThresholdConfig);
@@ -351,11 +323,9 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
     private void sendHelpMessage(CommandSender sender) {
         sender.sendMessage(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "=== Prometheus Argus - Aide ===");
         
-        // Commandes de base
         sendSingleHelpEntry(sender, "help", "Affiche ce message d'aide", "prometheusargus.command.base");
         sendSingleHelpEntry(sender, "reload", "Recharge la configuration", "prometheusargus.command.reload");
         
-        // Commandes de modération
         sendSingleHelpEntry(sender, "ban <joueur> <temps> <raison>", "Bannir un joueur", "prometheusargus.command.ban");
         sendSingleHelpEntry(sender, "unban <joueur>", "Débannir un joueur", "prometheusargus.command.unban");
         sendSingleHelpEntry(sender, "kick <joueur> <raison>", "Expulser un joueur", "prometheusargus.command.kick");
@@ -364,16 +334,13 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         sendSingleHelpEntry(sender, "freeze <joueur>", "Geler un joueur", "prometheusargus.command.freeze");
         sendSingleHelpEntry(sender, "mod", "Activer/désactiver le mode modérateur", "prometheusargus.modmode.use");
         
-        // Commandes d'information
         sendSingleHelpEntry(sender, "lookup <joueur>", "Voir les informations d'un joueur", "prometheusargus.command.lookup");
         sendSingleHelpEntry(sender, "history <joueur>", "Voir l'historique des sanctions", "prometheusargus.command.history");
         
-        // Commandes de notes
         sendSingleHelpEntry(sender, "notes <joueur> add <note>", "Ajouter une note", "prometheusargus.notes.add");
         sendSingleHelpEntry(sender, "notes <joueur> view", "Voir les notes", "prometheusargus.notes.view");
         sendSingleHelpEntry(sender, "notes <joueur> remove <index>", "Supprimer une note", "prometheusargus.notes.remove");
         
-        // Commandes de staff
         sendSingleHelpEntry(sender, "sc <message>", "Envoyer un message dans le staff chat", "prometheusargus.staffchat.use");
         sendSingleHelpEntry(sender, "sc", "Activer/désactiver le staff chat", "prometheusargus.staffchat.toggle");
         sendSingleHelpEntry(sender, "staff", "Ouvrir le menu staff", "prometheusargus.staffgui");
@@ -394,12 +361,6 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        // --- TA LOGIQUE onCommand EST PRÉSERVÉE ICI ---
-        // ... (tout ton switch case avec handleReportPlayerCommand et les autres handle*Commands) ...
-        // Assure-toi que les null checks pour les managers sont présents dans tes méthodes handle*Command
-        // comme dans l'exemple que j'avais fourni précédemment.
-        // Par exemple :
-        // if (staffGUIManager == null) { getLogger().severe(...); sender.sendMessage(...); return true; }
 
         if (cmd.getName().equalsIgnoreCase("report")) {
             return handleReportPlayerCommand(sender, args);
@@ -1154,7 +1115,7 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         playerNameComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/pa lookup " + player.getName()));
         mainMessage.addExtra(playerNameComponent);
         mainMessage.addExtra(new TextComponent(ChatColor.DARK_GRAY + " a échoué "));
-        TextComponent checkNameText = new TextComponent(checkNameInput); // Utiliser le nom original pour affichage
+        TextComponent checkNameText = new TextComponent(checkNameInput);
         checkNameText.setColor(checkColorStyle.asBungee());
         checkNameText.setBold(true);
         mainMessage.addExtra(checkNameText);
@@ -1170,7 +1131,7 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         }
         mainMessage.addExtra(new TextComponent(ChatColor.DARK_GRAY + ") "));
         TextComponent debugInfoText = new TextComponent("[" + debugInfo + "]");
-        debugInfoText.setColor(net.md_5.bungee.api.ChatColor.DARK_GRAY); // Correction de couleur
+        debugInfoText.setColor(net.md_5.bungee.api.ChatColor.DARK_GRAY);
         mainMessage.addExtra(debugInfoText);
 
         TextComponent tpButton = new TextComponent(" [TP]");
@@ -1313,19 +1274,14 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         }
     }
 
-    // AJOUT: Listener pour PlayerJoinEvent pour initialiser PlayerACData
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         initPlayerData(event.getPlayer());
     }
 
-    // AJOUT: Listener pour PlayerQuitEvent pour nettoyer PlayerACData
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         if (playerDataManager != null) {
-            // Tu auras besoin d'une méthode removePlayerData(UUID) dans PlayerDataManager
-            // Si elle n'existe pas, il faudra l'ajouter. Pour l'instant, je commente.
-            // playerDataManager.removePlayerData(event.getPlayer().getUniqueId()); 
              if (globalDebugMode) getLogger().info("[Prometheus DEBUG] Player " + event.getPlayer().getName() + " quit. (ACData would be removed here if method exists)");
         }
     }
@@ -1401,11 +1357,9 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
     }
 
     private void reloadAllConfigs() {
-        // Recharger la configuration principale
         reloadConfig();
         loadConfigValues();
         
-        // Recharger modmode.yml
         File modModeFile = new File(getDataFolder(), "modmode.yml");
         if (!modModeFile.exists()) {
             saveResource("modmode.yml", false);
@@ -1416,7 +1370,6 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         getLogger().info("[ModMode] persist-mode: " + modModeConfig.getBoolean("settings.persist-mode"));
         getLogger().info("[ModMode] allow-chat: " + modModeConfig.getBoolean("settings.allow-chat"));
         
-        // Recharger les autres fichiers de configuration
         File mutesFile = new File(getDataFolder(), "mutes.yml");
         if (!mutesFile.exists()) {
             saveResource("mutes.yml", false);
@@ -1441,7 +1394,6 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         }
         getLogger().info("[Config] sanction_history.yml rechargé");
         
-        // Sauvegarder les données des managers
         muteManager.saveMutes();
         reportManager.saveReports();
         playerNotesManager.saveNotes();
@@ -1449,7 +1401,6 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         
         getLogger().info("[Config] Tous les fichiers de configuration ont été rechargés");
         
-        // Afficher les valeurs actuelles de modmode.yml pour debug
         getLogger().info("[Config] modmode.yml - auto-vanish: " + modModeConfig.getBoolean("settings.auto-vanish"));
         getLogger().info("[Config] modmode.yml - persist-mode: " + modModeConfig.getBoolean("settings.persist-mode"));
         getLogger().info("[Config] modmode.yml - allow-chat: " + modModeConfig.getBoolean("settings.allow-chat"));
@@ -1461,14 +1412,12 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
         
         if (cmd.getName().equalsIgnoreCase("prometheusargus") || cmd.getName().equalsIgnoreCase("pa")) {
             if (args.length == 1) {
-                // Sous-commandes principales
                 completions.addAll(Arrays.asList(
                     "help", "reload", "ban", "unban", "kick", "mute", "unmute",
                     "freeze", "lookup", "history", "staff", "observe", "test",
                     "sc", "mod", "notes", "reports"
                 ));
             } else if (args.length == 2) {
-                // Suggestions pour les commandes nécessitant un joueur
                 String subCommand = args[0].toLowerCase();
                 if (Arrays.asList("ban", "unban", "kick", "mute", "unmute", "freeze", 
                                 "lookup", "history", "observe", "test", "notes").contains(subCommand)) {
@@ -1479,7 +1428,6 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
                     completions.addAll(Arrays.asList("1", "2", "3", "4", "5"));
                 }
             } else if (args.length == 3) {
-                // Suggestions pour les commandes avec des arguments supplémentaires
                 String subCommand = args[0].toLowerCase();
                 if (subCommand.equals("ban") || subCommand.equals("mute")) {
                     completions.addAll(Arrays.asList("1h", "2h", "6h", "12h", "1d", "7d", "30d", "perm"));
@@ -1489,12 +1437,10 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
             }
         } else if (cmd.getName().equalsIgnoreCase("report")) {
             if (args.length == 1) {
-                // Suggestions de joueurs pour le report
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     completions.add(player.getName());
                 }
             } else if (args.length == 2) {
-                // Suggestions de raisons pour le report
                 completions.addAll(Arrays.asList(
                     "cheat", "hack", "xray", "speed", "fly", "killaura",
                     "spam", "insult", "troll", "other"
@@ -1502,7 +1448,6 @@ public class PrometheusArgus extends JavaPlugin implements Listener, TabComplete
             }
         }
 
-        // Filtrer les suggestions en fonction de ce que l'utilisateur a déjà tapé
         return completions.stream()
             .filter(s -> s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
             .collect(Collectors.toList());

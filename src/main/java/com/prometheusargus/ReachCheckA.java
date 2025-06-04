@@ -9,20 +9,19 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import java.util.logging.Level; // Importer Level pour des logs plus fins si besoin
+import java.util.logging.Level;
 
 public class ReachCheckA implements Listener {
 
     private final PrometheusArgus plugin;
     private final double MAX_REACH_DISTANCE_SQUARED;
     private final double PLAYER_HITBOX_RADIUS_APPROX = 0.4;
-    private final boolean DEBUG_MODE; // Pour activer/désactiver les logs de debug facilement
+    private final boolean DEBUG_MODE;
 
     public ReachCheckA(PrometheusArgus plugin) {
         this.plugin = plugin;
         
-        // Lire la config pour le mode debug et la distance max
-        this.DEBUG_MODE = plugin.getConfig().getBoolean("checks.reach_a.debug_mode", true); // Par défaut à true pour nos tests
+        this.DEBUG_MODE = plugin.getConfig().getBoolean("checks.reach_a.debug_mode", true);
         double maxReach = plugin.getConfig().getDouble("checks.reach_a.max_distance", 4.2);
         
         if (DEBUG_MODE) {
@@ -67,7 +66,7 @@ public class ReachCheckA implements Listener {
         }
 
         Location damagerEyeLocation = damager.getEyeLocation();
-        Location targetLocation = target.getLocation(); // Base des pieds
+        Location targetLocation = target.getLocation();
 
         if (DEBUG_MODE) {
             plugin.getLogger().info("[ReachCheckA DEBUG] DamagerEyeLoc: X=" + String.format("%.2f",damagerEyeLocation.getX()) + ", Y=" + String.format("%.2f",damagerEyeLocation.getY()) + ", Z=" + String.format("%.2f",damagerEyeLocation.getZ()));
